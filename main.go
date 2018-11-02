@@ -64,7 +64,6 @@ type Message struct {
 	MID          string        `json:"mid,omitempty"`
 	Text         string        `json:"text,omitempty"`
 	QuickReplies *[]QuickReply `json:"quick_replies,omitempty"`
-	QuickReply   *QuickReply   `json:"quick_reply,omitempty"`
 	Attachments  *[]Attachment `json:"attachments,omitempty"`
 	Attachment   *Attachment   `json:"attachment,omitempty"`
 }
@@ -98,15 +97,17 @@ func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 
 func ProcessMessage(event Messaging) {
 	client := &http.Client{}
+	var replies []QuickReply
+	replies = append(replies, QuickReply{
+		ContentType: "location",
+	})
 	response := Response{
 		Recipient: User{
 			ID: event.Sender.ID,
 		},
 		Message: Message{
-			Text: "Please tell me your location",
-			QuickReply: &QuickReply{
-				ContentType: "location",
-			},
+			Text:         "Please tell me your location",
+			QuickReplies: &replies,
 
 			// Attachment: &Attachment{
 			// 	Type: "image",
