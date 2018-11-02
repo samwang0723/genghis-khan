@@ -36,14 +36,37 @@ type User struct {
 	ID string `json:"id,omitempty"`
 }
 
+// https://developers.facebook.com/docs/messenger-platform/send-messages/quick-replies#locations
+// "recipient":{
+// 	"id":"<PSID>"
+// },
+// "message":{
+// 	"text": "Here is a quick reply!",
+// 	"quick_replies":[
+// 		{
+// 			"content_type":"text",
+// 			"title":"Search",
+// 			"payload":"<POSTBACK_PAYLOAD>",
+// 			"image_url":"http://example.com/img/red.png"
+// 		},
+// 		{
+// 			"content_type":"location"
+// 		}
+// 	]
+// }
+
+type QuickReply struct {
+	ContentType string `json:"content_type,omitempty"`
+	Payload     string `json:"payload,omitempty"`
+}
+
 type Message struct {
-	MID        string `json:"mid,omitempty"`
-	Text       string `json:"text,omitempty"`
-	QuickReply *struct {
-		Payload string `json:"payload,omitempty"`
-	} `json:"quick_reply,omitempty"`
-	Attachments *[]Attachment `json:"attachments,omitempty"`
-	Attachment  *Attachment   `json:"attachment,omitempty"`
+	MID          string        `json:"mid,omitempty"`
+	Text         string        `json:"text,omitempty"`
+	QuickReplies *[]QuickReply `json:"quick_replies,omitempty"`
+	QuickReply   *QuickReply   `json:"quick_reply,omitempty"`
+	Attachments  *[]Attachment `json:"attachments,omitempty"`
+	Attachment   *Attachment   `json:"attachment,omitempty"`
 }
 
 type Attachment struct {
@@ -80,12 +103,17 @@ func ProcessMessage(event Messaging) {
 			ID: event.Sender.ID,
 		},
 		Message: Message{
-			Attachment: &Attachment{
-				Type: "image",
-				Payload: Payload{
-					URL: IMAGE,
-				},
+			Text: "Please tell me your location",
+			QuickReply: &QuickReply{
+				ContentType: "location",
 			},
+
+			// Attachment: &Attachment{
+			// 	Type: "image",
+			// 	Payload: Payload{
+			// 		URL: IMAGE,
+			// 	},
+			// },
 		},
 	}
 	body := new(bytes.Buffer)
