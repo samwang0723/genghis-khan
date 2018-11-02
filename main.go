@@ -78,8 +78,14 @@ type Response struct {
 	Message   Message `json:"message,omitempty"`
 }
 
+type Coordinates struct {
+	Lat  float32 `json:"lat,omitempty"`
+	Long float32 `json:"long,omitempty"`
+}
+
 type Payload struct {
-	URL string `json:"url,omitempty"`
+	URL         string       `json:"url,omitempty"`
+	Coordinates *Coordinates `json:"coordinates,omitempty"`
 }
 
 func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -96,6 +102,11 @@ func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProcessMessage(event Messaging) {
+	coordinates := event.Message.Attachment.Payload.Coordinates
+	if coordinates != nil {
+		log.Printf("User's location %f, %f", coordinates.Lat, coordinates.Long)
+	}
+
 	client := &http.Client{}
 	var replies []QuickReply
 	replies = append(replies, QuickReply{
