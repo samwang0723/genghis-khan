@@ -133,6 +133,8 @@ func main() {
 
 	r := mux.NewRouter()
 	r.HandleFunc("/", HomeEndpoint)
+	r.HandleFunc("/verify", VerificationEndpoint)
+	r.HandleFunc("/message", MessagesEndpoint)
 	if err := http.ListenAndServe(":"+port, r); err != nil {
 		log.Fatal(err)
 	}
