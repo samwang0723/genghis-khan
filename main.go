@@ -121,10 +121,6 @@ func MessagesEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func HomeEndpoint(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "Hello from honestbee :)")
-}
-
 func main() {
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -132,9 +128,8 @@ func main() {
 	}
 
 	r := mux.NewRouter()
-	r.HandleFunc("/", HomeEndpoint)
-	r.HandleFunc("/verify", VerificationEndpoint)
-	r.HandleFunc("/message", MessagesEndpoint)
+	r.HandleFunc("/webhook", VerificationEndpoint).Methods("GET")
+	r.HandleFunc("/webhook", MessagesEndpoint).Methods("POST")
 	if err := http.ListenAndServe(":"+port, r); err != nil {
 		log.Fatal(err)
 	}
