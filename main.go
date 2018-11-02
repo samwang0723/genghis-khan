@@ -102,8 +102,8 @@ func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func ProcessMessage(event Messaging) {
-	coordinates := event.Message.Attachment.Payload.Coordinates
-	if coordinates != nil {
+	if event.Message.Attachment != nil {
+		coordinates := event.Message.Attachment.Payload.Coordinates
 		log.Printf("User's location %f, %f", coordinates.Lat, coordinates.Long)
 	}
 
