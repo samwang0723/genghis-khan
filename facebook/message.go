@@ -84,7 +84,7 @@ type Payload struct {
 }
 
 //ComposeLocation - response with location
-func ComposeLocation(event Messaging) Response {
+func ComposeLocation(event Messaging) *Response {
 	for _, attachment := range *event.Message.Attachments {
 		coordinates := attachment.Payload.Coordinates
 		log.Printf("User's location %f, %f", coordinates.Lat, coordinates.Long)
@@ -103,11 +103,11 @@ func ComposeLocation(event Messaging) Response {
 			QuickReplies: &replies,
 		},
 	}
-	return response
+	return &response
 }
 
 //ComposeBrandList - response with brand list
-func ComposeBrandList(event Messaging) Response {
+func ComposeBrandList(event Messaging) *Response {
 	var buttons []Button
 	buttons = append(buttons, Button{
 		Title:               "View",
@@ -146,5 +146,5 @@ func ComposeBrandList(event Messaging) Response {
 			},
 		},
 	}
-	return response
+	return &response
 }
