@@ -110,6 +110,18 @@ func ComposeLocation(event Messaging) *Response {
 	return &response
 }
 
+func ComposeText(senderID string, message string) *Response {
+	response := Response{
+		Recipient: User{
+			ID: senderID,
+		},
+		Message: Message{
+			Text: message,
+		},
+	}
+	return &response
+}
+
 //ComposeBrandList - response with brand list
 func ComposeBrandList(event Messaging) *Response {
 	var buttons []Button

@@ -33,8 +33,8 @@ func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 func keywordFilters(event facebook.Messaging) *facebook.Response {
 	coordinates := facebook.ParseLocation(event)
 	if coordinates != nil {
-		log.Printf("User's location %f, %f", coordinates.Lat, coordinates.Long)
-		return nil
+		msg := fmt.Sprintf("Hey! your location is %f, %f", coordinates.Lat, coordinates.Long)
+		return facebook.ComposeText(event.Sender.ID, msg)
 	}
 
 	switch event.Message.Text {
