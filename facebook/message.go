@@ -83,12 +83,10 @@ type Payload struct {
 
 // ParseLocation - parse latitude and longitude
 func ParseLocation(event Messaging) *Coordinates {
-	if *event.Message.Attachments != nil {
-		for _, attachment := range *event.Message.Attachments {
-			coordinates := attachment.Payload.Coordinates
-			if coordinates != nil {
-				return coordinates
-			}
+	for _, attachment := range *event.Message.Attachments {
+		coordinates := attachment.Payload.Coordinates
+		if coordinates != nil {
+			return coordinates
 		}
 	}
 	return nil

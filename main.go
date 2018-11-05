@@ -31,18 +31,19 @@ func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func keywordFilters(event facebook.Messaging) *facebook.Response {
-	coordinates := facebook.ParseLocation(event)
-	if coordinates != nil {
-		msg := fmt.Sprintf("Hey! your location is %f, %f", coordinates.Lat, coordinates.Long)
-		return facebook.ComposeText(event.Sender.ID, msg)
-	}
-
 	switch event.Message.Text {
 	case "get_location":
 		return facebook.ComposeLocation(event)
 	case "brands":
 		return facebook.ComposeBrandList(event)
 	}
+
+	coordinates := facebook.ParseLocation(event)
+	if coordinates != nil {
+		msg := fmt.Sprintf("Hey! your location is %f, %f", coordinates.Lat, coordinates.Long)
+		return facebook.ComposeText(event.Sender.ID, msg)
+	}
+
 	return nil
 }
 
