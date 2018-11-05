@@ -33,10 +33,10 @@ func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 func ProcessMessage(event facebook.Messaging) {
 	client := &http.Client{}
 	response := facebook.ComposeBrandList(event)
-	log.Println(&response)
 	body := new(bytes.Buffer)
 	json.NewEncoder(body).Encode(&response)
 	url := fmt.Sprintf(FACEBOOK_API, os.Getenv("PAGE_ACCESS_TOKEN"))
+	log.Println(body)
 	req, err := http.NewRequest("POST", url, body)
 	req.Header.Add("Content-Type", "application/json")
 	if err != nil {
