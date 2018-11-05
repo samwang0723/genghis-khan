@@ -36,16 +36,17 @@ func ProcessMessage(event facebook.Messaging) {
 	body := new(bytes.Buffer)
 	json.NewEncoder(body).Encode(&response)
 	url := fmt.Sprintf(FACEBOOK_API, os.Getenv("PAGE_ACCESS_TOKEN"))
-	log.Println(body)
 	req, err := http.NewRequest("POST", url, body)
 	req.Header.Add("Content-Type", "application/json")
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err.Error())
+		return
 	}
 
 	resp, err := client.Do(req)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err.Error())
+		return
 	}
 	defer resp.Body.Close()
 	err = facebook.CheckFacebookError(resp.Body)
