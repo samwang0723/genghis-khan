@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/genghis-khan/facebook"
 	"github.com/gorilla/mux"
+	"github.com/samwang0723/genghis-khan/facebook"
 )
 
 const (
