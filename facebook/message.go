@@ -1,7 +1,5 @@
 package facebook
 
-import "log"
-
 type Callback struct {
 	Object string `json:"object,omitempty"`
 	Entry  []struct {
@@ -83,13 +81,19 @@ type Payload struct {
 	Buttons         *[]Button    `json:"buttons,omitempty"`
 }
 
-//ComposeLocation - response with location
-func ComposeLocation(event Messaging) *Response {
+// ParseLocation - parse latitude and longitude
+func ParseLocation(event Messaging) *Coordinates {
 	for _, attachment := range *event.Message.Attachments {
 		coordinates := attachment.Payload.Coordinates
-		log.Printf("User's location %f, %f", coordinates.Lat, coordinates.Long)
+		if coordinates != nil {
+			return coordinates
+		}
 	}
+	return nil
+}
 
+// ComposeLocation - response with location
+func ComposeLocation(event Messaging) *Response {
 	var replies []QuickReply
 	replies = append(replies, QuickReply{
 		ContentType: "location",

@@ -30,9 +30,28 @@ func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func keywordFilters(event facebook.Messaging) *facebook.Response {
+	coordinates := facebook.ParseLocation(event)
+	if coordinates != nil {
+		log.Printf("User's location %f, %f", coordinates.Lat, coordinates.Long)
+		return nil
+	}
+
+	switch event.Message.Text {
+	case "get_location":
+		return facebook.ComposeLocation(event)
+	case "brands":
+		return facebook.ComposeBrandList(event)
+	}
+	return nil
+}
+
 func ProcessMessage(event facebook.Messaging) {
 	client := &http.Client{}
-	response := facebook.ComposeBrandList(event)
+	response := keywordFilters(event)
+	if response == nil {
+		return
+	}
 	body := new(bytes.Buffer)
 	json.NewEncoder(body).Encode(&response)
 	url := fmt.Sprintf(FACEBOOK_API, os.Getenv("PAGE_ACCESS_TOKEN"))
