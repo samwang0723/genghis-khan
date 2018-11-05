@@ -135,12 +135,11 @@ func ComposeBrandList(event Messaging) *Response {
 			ID: event.Sender.ID,
 		},
 		Message: Message{
-			Text: "Please tell me your location",
 			Attachment: &Attachment{
 				Type: "template",
 				Payload: Payload{
 					TemplateType:    "list",
-					TopElementStyle: "large",
+					TopElementStyle: "compact",
 					Elements:        &elements,
 				},
 			},
