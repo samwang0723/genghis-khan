@@ -24,7 +24,7 @@
 #   go-tests = true
 #   unused-packages = true
 
-ignored = ["github.com/genghis-khan*"]
+ignored = ["github.com/genghis-khan/facebook", "github.com/genghis-khan/external"]
 
 [[constraint]]
   name = "github.com/gorilla/mux"
