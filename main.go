@@ -48,6 +48,10 @@ func ProcessMessage(event facebook.Messaging) {
 		log.Fatal(err)
 	}
 	defer resp.Body.Close()
+	err = facebook.CheckFacebookError(resp.Body)
+	if err != nil {
+		log.Println(err.Error())
+	}
 }
 
 func MessagesEndpoint(w http.ResponseWriter, r *http.Request) {
