@@ -41,7 +41,7 @@ type Attachment struct {
 type Response struct {
 	Recipient    User    `json:"recipient,omitempty"`
 	Message      Message `json:"message,omitempty"`
-	SendorAction string  `json:"sendor_action,omitempty"`
+	SenderAction string  `json:"sender_action,omitempty"`
 }
 
 type Coordinates struct {
@@ -99,7 +99,7 @@ func SenderTypingAction(event Messaging) *Response {
 		Recipient: User{
 			ID: event.Sender.ID,
 		},
-		SendorAction: "typing_on",
+		SenderAction: "typing_on",
 	}
 	return &response
 }
