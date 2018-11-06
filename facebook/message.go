@@ -39,9 +39,13 @@ type Attachment struct {
 }
 
 type Response struct {
-	Recipient    User    `json:"recipient,omitempty"`
-	Message      Message `json:"message,omitempty"`
-	SenderAction string  `json:"sender_action,omitempty"`
+	Recipient User    `json:"recipient,omitempty"`
+	Message   Message `json:"message,omitempty"`
+}
+
+type ActionResponse struct {
+	Recipient    User   `json:"recipient,omitempty"`
+	SenderAction string `json:"sender_action,omitempty"`
 }
 
 type Coordinates struct {
@@ -94,8 +98,8 @@ func ParseLocation(event Messaging) *Coordinates {
 }
 
 // SenderTypingAction - response with typing actions
-func SenderTypingAction(event Messaging) *Response {
-	response := Response{
+func SenderTypingAction(event Messaging) *ActionResponse {
+	response := ActionResponse{
 		Recipient: User{
 			ID: event.Sender.ID,
 		},
