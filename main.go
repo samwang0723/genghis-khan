@@ -48,34 +48,8 @@ func keywordFilters(event facebook.Messaging) *facebook.Response {
 	return nil
 }
 
-func Respond(response *facebook.Response) {
+func Respond(body *bytes.Buffer) {
 	client := &http.Client{}
-	body := new(bytes.Buffer)
-	json.NewEncoder(body).Encode(&response)
-	url := fmt.Sprintf(FACEBOOK_API, os.Getenv("PAGE_ACCESS_TOKEN"))
-	req, err := http.NewRequest("POST", url, body)
-	req.Header.Add("Content-Type", "application/json")
-	if err != nil {
-		log.Println(err.Error())
-		return
-	}
-
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Println(err.Error())
-		return
-	}
-	defer resp.Body.Close()
-	err = facebook.CheckFacebookError(resp.Body)
-	if err != nil {
-		log.Println(err.Error())
-	}
-}
-
-func SenderAction(response *facebook.ActionResponse) {
-	client := &http.Client{}
-	body := new(bytes.Buffer)
-	json.NewEncoder(body).Encode(&response)
 	url := fmt.Sprintf(FACEBOOK_API, os.Getenv("PAGE_ACCESS_TOKEN"))
 	req, err := http.NewRequest("POST", url, body)
 	req.Header.Add("Content-Type", "application/json")
@@ -98,14 +72,18 @@ func SenderAction(response *facebook.ActionResponse) {
 
 func ProcessMessage(event facebook.Messaging) {
 	typing := facebook.SenderTypingAction(event)
-	SenderAction(typing)
+	body := new(bytes.Buffer)
+	json.NewEncoder(body).Encode(&typing)
+	Respond(body)
 
 	time.Sleep(2 * time.Second)
 	response := keywordFilters(event)
 	if response == nil {
 		return
 	}
-	Respond(response)
+	body.Truncate(body.Len())
+	json.NewEncoder(body).Encode(&response)
+	Respond(body)
 }
 
 func MessagesEndpoint(w http.ResponseWriter, r *http.Request) {
