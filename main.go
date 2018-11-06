@@ -44,7 +44,8 @@ func keywordFilters(event facebook.Messaging) *facebook.Response {
 	if coordinates != nil {
 		services, err := honestbee.GetServices("TW", coordinates.Lat, coordinates.Long)
 		if err != nil {
-			return facebook.ComposeText(event.Sender.ID, "Cannot read services.")
+			str := fmt.Sprintf("Cannot read services: %s", err.Error())
+			return facebook.ComposeText(event.Sender.ID, str)
 		}
 		return facebook.ComposeServicesButton(event.Sender.ID, services)
 	}
