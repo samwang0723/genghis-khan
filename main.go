@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/samwang0723/genghis-khan/facebook"
@@ -75,6 +76,7 @@ func ProcessMessage(event facebook.Messaging) {
 	typing := facebook.SenderTypingAction(event)
 	SendRequest(typing)
 
+	time.Sleep(2 * time.Second)
 	response := keywordFilters(event)
 	if response == nil {
 		return
