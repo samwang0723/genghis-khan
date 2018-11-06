@@ -11,6 +11,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/samwang0723/genghis-khan/facebook"
+	"github.com/samwang0723/genghis-khan/honestbee"
 )
 
 const (
@@ -41,8 +42,11 @@ func keywordFilters(event facebook.Messaging) *facebook.Response {
 
 	coordinates := facebook.ParseLocation(event)
 	if coordinates != nil {
-		msg := fmt.Sprintf("Hey! your location is %f, %f", coordinates.Lat, coordinates.Long)
-		return facebook.ComposeText(event.Sender.ID, msg)
+		services, err := honestbee.GetServices("TW", coordinates.Lat, coordinates.Long)
+		if err != nil {
+			return facebook.ComposeText(event.Sender.ID, "Cannot read services.")
+		}
+		return facebook.ComposeServicesButton(event.Sender.ID, services)
 	}
 
 	return nil

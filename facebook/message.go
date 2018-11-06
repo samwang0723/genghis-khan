@@ -1,5 +1,7 @@
 package facebook
 
+import "github.com/samwang0723/genghis-khan/honestbee"
+
 type Callback struct {
 	Object string `json:"object,omitempty"`
 	Entry  []struct {
@@ -61,12 +63,13 @@ type DefaultAction struct {
 }
 
 type Button struct {
-	Title               string `json:"title,omitempty"`
-	Type                string `json:"type,omitempty"`
-	URL                 string `json:"url,omitempty"`
-	MessengerExtensions bool   `json:"messenger_extensions,omitempty"`
-	WebViewHeightRatio  string `json:"webview_height_ratio,omitempty"`
-	FallbackURL         string `json:"fallback_url,omitempty"`
+	Title               string  `json:"title,omitempty"`
+	Type                string  `json:"type,omitempty"`
+	URL                 string  `json:"url,omitempty"`
+	MessengerExtensions bool    `json:"messenger_extensions,omitempty"`
+	WebViewHeightRatio  string  `json:"webview_height_ratio,omitempty"`
+	FallbackURL         string  `json:"fallback_url,omitempty"`
+	Payload             Payload `json:"payload,omitempty"`
 }
 
 type Element struct {
@@ -79,11 +82,23 @@ type Element struct {
 
 type Payload struct {
 	URL             string       `json:"url,omitempty"`
+	Text            string       `json:"text,omitempty"`
 	TemplateType    string       `json:"template_type,omitempty"`
 	TopElementStyle string       `json:"top_element_style,omitempty"` // large, compact
 	Coordinates     *Coordinates `json:"coordinates,omitempty"`
 	Elements        *[]Element   `json:"elements,omitempty"`
 	Buttons         *[]Button    `json:"buttons,omitempty"`
+}
+
+// SenderTypingAction - response with typing actions
+func SenderTypingAction(event Messaging) *ActionResponse {
+	response := ActionResponse{
+		Recipient: User{
+			ID: event.Sender.ID,
+		},
+		SenderAction: "typing_on",
+	}
+	return &response
 }
 
 // ParseLocation - parse latitude and longitude
@@ -97,13 +112,30 @@ func ParseLocation(event Messaging) *Coordinates {
 	return nil
 }
 
-// SenderTypingAction - response with typing actions
-func SenderTypingAction(event Messaging) *ActionResponse {
-	response := ActionResponse{
+func ComposeServicesButton(PSID string, services *[]honestbee.Service) *Response {
+	var buttons []Button
+	for _, service := range *services {
+		buttons = append(buttons, Button{
+			Title: service.ServiceType,
+			Type:  "postback",
+			Payload: Payload{
+				Text: service.ServiceType,
+			},
+		})
+	}
+
+	response := Response{
 		Recipient: User{
-			ID: event.Sender.ID,
+			ID: PSID,
 		},
-		SenderAction: "typing_on",
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "template",
+				Payload: Payload{
+					Buttons: &buttons,
+				},
+			},
+		},
 	}
 	return &response
 }
