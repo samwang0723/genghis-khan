@@ -63,13 +63,13 @@ type DefaultAction struct {
 }
 
 type Button struct {
-	Title               string  `json:"title,omitempty"`
-	Type                string  `json:"type,omitempty"`
-	URL                 string  `json:"url,omitempty"`
-	MessengerExtensions bool    `json:"messenger_extensions,omitempty"`
-	WebViewHeightRatio  string  `json:"webview_height_ratio,omitempty"`
-	FallbackURL         string  `json:"fallback_url,omitempty"`
-	Payload             Payload `json:"payload,omitempty"`
+	Title               string `json:"title,omitempty"`
+	Type                string `json:"type,omitempty"`
+	URL                 string `json:"url,omitempty"`
+	MessengerExtensions bool   `json:"messenger_extensions,omitempty"`
+	WebViewHeightRatio  string `json:"webview_height_ratio,omitempty"`
+	FallbackURL         string `json:"fallback_url,omitempty"`
+	Payload             string `json:"payload,omitempty"`
 }
 
 type Element struct {
@@ -116,11 +116,9 @@ func ComposeServicesButton(PSID string, services *[]honestbee.Service) *Response
 	var buttons []Button
 	for _, service := range *services {
 		buttons = append(buttons, Button{
-			Title: service.ServiceType,
-			Type:  "postback",
-			Payload: Payload{
-				Text: service.ServiceType,
-			},
+			Title:   service.ServiceType,
+			Type:    "postback",
+			Payload: service.ServiceType,
 		})
 	}
 
