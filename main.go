@@ -52,6 +52,7 @@ func SendRequest(response *facebook.Response) {
 	client := &http.Client{}
 	body := new(bytes.Buffer)
 	json.NewEncoder(body).Encode(&response)
+	log.Println(body)
 	url := fmt.Sprintf(FACEBOOK_API, os.Getenv("PAGE_ACCESS_TOKEN"))
 	req, err := http.NewRequest("POST", url, body)
 	req.Header.Add("Content-Type", "application/json")
