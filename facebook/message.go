@@ -132,7 +132,8 @@ func ComposeServicesButton(PSID string, services *[]honestbee.Service) *Response
 			Attachment: &Attachment{
 				Type: "template",
 				Payload: Payload{
-					Buttons: &buttons,
+					TemplateType: "button",
+					Buttons:      &buttons,
 				},
 			},
 		},
