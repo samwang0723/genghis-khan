@@ -31,9 +31,9 @@ func GetServices(countryCode string, latitude float32, longitude float32) (*[]Se
 	}
 	defer resp.Body.Close()
 
-	var services *[]Service
-	if err := jsoniter.NewDecoder(resp.Body).Decode(services); err != nil {
+	services := make([]Service, 0)
+	if err := jsoniter.NewDecoder(resp.Body).Decode(&services); err != nil {
 		return nil, err
 	}
-	return services, nil
+	return &services, nil
 }
