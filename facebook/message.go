@@ -131,6 +131,7 @@ func ComposeServicesButton(PSID string, services *[]honestbee.Service) *Response
 				Type: "template",
 				Payload: Payload{
 					TemplateType: "button",
+					Text:         "These are the available services",
 					Buttons:      &buttons,
 				},
 			},
