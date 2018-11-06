@@ -47,12 +47,8 @@ func keywordFilters(event facebook.Messaging) *facebook.Response {
 	return nil
 }
 
-func ProcessMessage(event facebook.Messaging) {
+func SendRequest(response *facebook.Response) {
 	client := &http.Client{}
-	response := keywordFilters(event)
-	if response == nil {
-		return
-	}
 	body := new(bytes.Buffer)
 	json.NewEncoder(body).Encode(&response)
 	url := fmt.Sprintf(FACEBOOK_API, os.Getenv("PAGE_ACCESS_TOKEN"))
@@ -73,6 +69,17 @@ func ProcessMessage(event facebook.Messaging) {
 	if err != nil {
 		log.Println(err.Error())
 	}
+}
+
+func ProcessMessage(event facebook.Messaging) {
+	typing := facebook.SenderTypingAction(event)
+	SendRequest(typing)
+
+	response := keywordFilters(event)
+	if response == nil {
+		return
+	}
+	SendRequest(response)
 }
 
 func MessagesEndpoint(w http.ResponseWriter, r *http.Request) {
