@@ -125,6 +125,7 @@ func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Resp
 			replies = append(replies, QuickReply{
 				ContentType: "text",
 				Title:       service.ServiceType,
+				Payload:     service.ServiceType,
 			})
 		}
 	}

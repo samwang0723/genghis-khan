@@ -33,8 +33,6 @@ func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func keywordFilters(event facebook.Messaging) *facebook.Response {
-	fmt.Printf("%+v\n", event)
-
 	switch event.Message.Text {
 	case "get_location":
 		return facebook.ComposeLocation(event)
@@ -96,6 +94,7 @@ func ProcessMessage(event facebook.Messaging) {
 func MessagesEndpoint(w http.ResponseWriter, r *http.Request) {
 	var callback facebook.Callback
 	json.NewDecoder(r.Body).Decode(&callback)
+	fmt.Printf("%+v\n", callback)
 	if callback.Object == "page" {
 		for _, entry := range callback.Entry {
 			for _, event := range entry.Messaging {
