@@ -133,7 +133,7 @@ func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Resp
 			buttons = append(buttons, Button{
 				Title:   service.ServiceType,
 				Type:    "postback",
-				Payload: fmt.Sprintf("brands:%s", service.ServiceType),
+				Payload: fmt.Sprintf("brands:%s:1", service.ServiceType),
 			})
 		}
 	}
