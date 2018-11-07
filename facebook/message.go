@@ -16,10 +16,16 @@ type Callback struct {
 }
 
 type Messaging struct {
-	Sender    User    `json:"sender,omitempty"`
-	Recipient User    `json:"recipient,omitempty"`
-	Timestamp int     `json:"timestamp,omitempty"`
-	Message   Message `json:"message,omitempty"`
+	Sender    User     `json:"sender,omitempty"`
+	Recipient User     `json:"recipient,omitempty"`
+	Timestamp int      `json:"timestamp,omitempty"`
+	Message   Message  `json:"message,omitempty"`
+	PostBack  PostBack `json:"postback,omitempty"`
+}
+
+type PostBack struct {
+	Title   string `json:"title,omitempty"`
+	Payload string `json:"payload,omitempty"`
 }
 
 type User struct {
@@ -27,10 +33,10 @@ type User struct {
 }
 
 type QuickReply struct {
-	ContentType string            `json:"content_type,omitempty"`
-	Title       string            `json:"title,omitempty"`
-	ImageURL    string            `json:"image_url,omitempty"`
-	Payload     CustomizedPayload `json:"payload,omitempty"`
+	ContentType string `json:"content_type,omitempty"`
+	Title       string `json:"title,omitempty"`
+	ImageURL    string `json:"image_url,omitempty"`
+	Payload     string `json:"payload,omitempty"`
 }
 
 type Message struct {
@@ -96,11 +102,6 @@ type Payload struct {
 	Buttons         *[]Button    `json:"buttons,omitempty"`
 }
 
-type CustomizedPayload struct {
-	Value string `json:"value,omitempty"`
-	Type  string `json:"type,omitempty"`
-}
-
 // SenderTypingAction - response with typing actions
 func SenderTypingAction(event Messaging) *ActionResponse {
 	response := ActionResponse{
@@ -129,13 +130,11 @@ func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Resp
 	var replies []QuickReply
 	for _, service := range *services {
 		if service.Avaliable {
+			postback := fmt.Sprintf(`{"selectedService": "%s"}`, service.ServiceType)
 			replies = append(replies, QuickReply{
 				ContentType: "text",
 				Title:       service.ServiceType,
-				Payload: CustomizedPayload{
-					Value: service.ServiceType,
-					Type:  "service_selection",
-				},
+				Payload:     postback,
 			})
 		}
 	}
