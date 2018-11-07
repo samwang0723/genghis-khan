@@ -109,10 +109,12 @@ func SenderTypingAction(event Messaging) *ActionResponse {
 
 // ParseLocation - parse latitude and longitude
 func ParseLocation(event Messaging) *Coordinates {
-	for _, attachment := range *event.Message.Attachments {
-		coordinates := attachment.Payload.Coordinates
-		if coordinates != nil {
-			return coordinates
+	if event.Message.Attachments != nil {
+		for _, attachment := range *event.Message.Attachments {
+			coordinates := attachment.Payload.Coordinates
+			if coordinates != nil {
+				return coordinates
+			}
 		}
 	}
 	return nil
