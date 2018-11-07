@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -93,8 +94,9 @@ func ProcessMessage(event facebook.Messaging) {
 
 func MessagesEndpoint(w http.ResponseWriter, r *http.Request) {
 	var callback facebook.Callback
-	json.NewDecoder(r.Body).Decode(&callback)
-	fmt.Printf("%+v\n", callback)
+	// json.NewDecoder(r.Body).Decode(&callback)
+	htmlData, _ := ioutil.ReadAll(r.Body)
+	fmt.Println(string(htmlData))
 	if callback.Object == "page" {
 		for _, entry := range callback.Entry {
 			for _, event := range entry.Messaging {
