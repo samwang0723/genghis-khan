@@ -127,13 +127,13 @@ func ParseLocation(event Messaging) *Coordinates {
 }
 
 func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Response {
-	var replies []QuickReply
+	var buttons []Button
 	for _, service := range *services {
 		if service.Avaliable {
-			replies = append(replies, QuickReply{
-				ContentType: "text",
-				Title:       service.ServiceType,
-				Payload:     "selected_service",
+			buttons = append(buttons, Button{
+				Title:   service.ServiceType,
+				Type:    "postback",
+				Payload: "selected_service",
 			})
 		}
 	}
@@ -143,8 +143,14 @@ func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Resp
 			ID: SenderID,
 		},
 		Message: Message{
-			Text:         "These are the available services:",
-			QuickReplies: &replies,
+			Attachment: &Attachment{
+				Type: "template",
+				Payload: Payload{
+					TemplateType: "button",
+					Text:         "These are the available services",
+					Buttons:      &buttons,
+				},
+			},
 		},
 	}
 	return &response

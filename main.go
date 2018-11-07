@@ -118,6 +118,7 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/webhook", VerificationEndpoint).Methods("GET")
 	r.HandleFunc("/webhook", MessagesEndpoint).Methods("POST")
+	r.HandleFunc("/postback", MessagesEndpoint).Methods("POST")
 	if err := http.ListenAndServe(":"+port, r); err != nil {
 		log.Fatal(err)
 	}
