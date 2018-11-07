@@ -19,6 +19,9 @@ const (
 	IMAGE        = "http://37.media.tumblr.com/e705e901302b5925ffb2bcf3cacb5bcd/tumblr_n6vxziSQD11slv6upo3_500.gif"
 )
 
+var latitude float32
+var longitude float32
+
 func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("hub.challenge")
 	token := r.URL.Query().Get("hub.verify_token")
@@ -32,12 +35,26 @@ func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func postbackHandling(event facebook.Messaging) *facebook.Response {
+	if event.PostBack.Payload == "selected_service" {
+		brands, err := honestbee.GetBrands("TW", event.PostBack.Title, latitude, longitude)
+		if err != nil {
+			str := fmt.Sprintf("No brand served in your location: %s", err.Error())
+			return facebook.ComposeText(event.Sender.ID, str)
+		}
+		return facebook.ComposeBrandList(event, *brands)
+	}
+	return nil
+}
+
 func keywordFilters(event facebook.Messaging) *facebook.Response {
+	if event.PostBack != nil {
+		return postbackHandling(event)
+	}
+
 	switch event.Message.Text {
 	case "get_location":
 		return facebook.ComposeLocation(event)
-	case "brands":
-		// return facebook.ComposeBrandList(event)
 	}
 
 	coordinates := facebook.ParseLocation(event)
@@ -47,6 +64,8 @@ func keywordFilters(event facebook.Messaging) *facebook.Response {
 			str := fmt.Sprintf("Cannot read services: %s", err.Error())
 			return facebook.ComposeText(event.Sender.ID, str)
 		}
+		latitude = coordinates.Lat
+		longitude = coordinates.Long
 		return facebook.ComposeServicesButton(event.Sender.ID, services)
 	}
 
