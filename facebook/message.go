@@ -27,10 +27,10 @@ type User struct {
 }
 
 type QuickReply struct {
-	ContentType string `json:"content_type,omitempty"`
-	Title       string `json:"title,omitempty"`
-	ImageURL    string `json:"image_url,omitempty"`
-	Payload     string `json:"payload,omitempty"`
+	ContentType string            `json:"content_type,omitempty"`
+	Title       string            `json:"title,omitempty"`
+	ImageURL    string            `json:"image_url,omitempty"`
+	Payload     CustomizedPayload `json:"payload,omitempty"`
 }
 
 type Message struct {
@@ -96,6 +96,11 @@ type Payload struct {
 	Buttons         *[]Button    `json:"buttons,omitempty"`
 }
 
+type CustomizedPayload struct {
+	Value string `json:"value,omitempty"`
+	Type  string `json:"type,omitempty"`
+}
+
 // SenderTypingAction - response with typing actions
 func SenderTypingAction(event Messaging) *ActionResponse {
 	response := ActionResponse{
@@ -127,7 +132,10 @@ func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Resp
 			replies = append(replies, QuickReply{
 				ContentType: "text",
 				Title:       service.ServiceType,
-				Payload:     service.ServiceType,
+				Payload: CustomizedPayload{
+					Value: service.ServiceType,
+					Type:  "service_selection",
+				},
 			})
 		}
 	}
