@@ -93,6 +93,7 @@ func ProcessMessage(event facebook.Messaging) {
 
 func MessagesEndpoint(w http.ResponseWriter, r *http.Request) {
 	var callback facebook.Callback
+	log.Println(r.Body)
 	json.NewDecoder(r.Body).Decode(&callback)
 	if callback.Object == "page" {
 		for _, entry := range callback.Entry {

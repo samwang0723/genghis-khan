@@ -1,6 +1,10 @@
 package facebook
 
-import "github.com/samwang0723/genghis-khan/honestbee"
+import (
+	"fmt"
+
+	"github.com/samwang0723/genghis-khan/honestbee"
+)
 
 type Callback struct {
 	Object string `json:"object,omitempty"`
@@ -112,19 +116,21 @@ func ParseLocation(event Messaging) *Coordinates {
 	return nil
 }
 
-func ComposeServicesButton(PSID string, services *[]honestbee.Service) *Response {
+func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Response {
 	var buttons []Button
 	for _, service := range *services {
-		buttons = append(buttons, Button{
-			Title:   service.ServiceType,
-			Type:    "postback",
-			Payload: service.ServiceType,
-		})
+		if service.Avaliable {
+			buttons = append(buttons, Button{
+				Title:   service.ServiceType,
+				Type:    "postback",
+				Payload: service.ServiceType,
+			})
+		}
 	}
 
 	response := Response{
 		Recipient: User{
-			ID: PSID,
+			ID: SenderID,
 		},
 		Message: Message{
 			Attachment: &Attachment{
@@ -171,29 +177,26 @@ func ComposeText(senderID string, message string) *Response {
 }
 
 //ComposeBrandList - response with brand list
-func ComposeBrandList(event Messaging) *Response {
-	var buttons []Button
-	buttons = append(buttons, Button{
-		Title:               "View",
-		Type:                "web_url",
-		URL:                 "https://peterssendreceiveapp.ngrok.io/collection",
-		MessengerExtensions: true,
-		WebViewHeightRatio:  "tall",
-		FallbackURL:         "https://peterssendreceiveapp.ngrok.io/",
-	})
+func ComposeBrandList(event Messaging, brands honestbee.Brands) *Response {
 	var elements []Element
-	elements = append(elements, Element{
-		Title:    "Classic T-Shirt Collection",
-		SubTitle: "See all our colors",
-		ImageURL: "https://peterssendreceiveapp.ngrok.io/img/collection.png",
-		Buttons:  &buttons,
-	})
-	elements = append(elements, Element{
-		Title:    "Classic Blue T-Shirt",
-		SubTitle: "100% Cotton, 200% Comfortable",
-		ImageURL: "https://peterssendreceiveapp.ngrok.io/img/collection.png",
-		Buttons:  &buttons,
-	})
+	for _, brand := range brands.Brands {
+		brandURL := fmt.Sprintf("https://www.honestbee.tw/zh-TW/%s/stores/%s", brand.ServiceType, brand.Slug)
+		var buttons []Button
+		buttons = append(buttons, Button{
+			Title:               "View",
+			Type:                "web_url",
+			URL:                 brandURL,
+			MessengerExtensions: true,
+			WebViewHeightRatio:  "tall",
+		})
+		elements = append(elements, Element{
+			Title:    brand.Name,
+			SubTitle: brand.Description,
+			ImageURL: brand.ImageURL,
+			Buttons:  &buttons,
+		})
+	}
+
 	response := Response{
 		Recipient: User{
 			ID: event.Sender.ID,

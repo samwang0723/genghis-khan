@@ -7,14 +7,44 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-//https://core-staging.honestbee.com/api/countries/PH/available_services?latitude=14.5367633&longitude=121.009545
-//https://core.honestbee.com/api/brands?countryCode=TW&page=1&page_size=48&serviceType=groceries&latitude=14.5367633&longitude=121.009545
-// /api/stores/17/directory?zoneId=1&latitude=1.3481059&longitude=103.8638325
-// /api/zones/2/brands?tag=橄欖油,西式料理&service_type=food
-
 type Service struct {
 	ServiceType string `json:"service_type"`
 	Avaliable   bool   `json:"available"`
+}
+
+type Meta struct {
+	CurrentPage int `json:"current_page"`
+	TotalPages  int `json:"total_pages"`
+	TotalCount  int `json:"total_count"`
+}
+
+type Brands struct {
+	Brands  []Brand `json:"brands"`
+	Meta    Meta    `json:"meta"`
+	ID      string  `json:"id"`
+	Variant string  `json:"variant"`
+}
+
+type Brand struct {
+	ID                       int    `json:"id"`
+	Name                     string `json:"name"`
+	About                    string `json:"about"`
+	Description              string `json:"description"`
+	FreeDeliveryEligible     bool   `json:"freeDeliveryEligible"`
+	BrandColor               string `json:"brandColor"`
+	DefaultConciergeFee      string `json:"defaultConciergeFee"`
+	DefaultDeliveryFee       string `json:"defaultDeliveryFee"`
+	MinimumOrderFreeDelivery string `json:"minimumOrderFreeDelivery"`
+	MinimumSpendExtraFee     string `json:"minimumSpendExtraFee"`
+	ServiceType              string `json:"serviceType"`
+	Slug                     string `json:"slug"`
+	StoreID                  int    `json:"storeId"`
+	ImageURL                 string `json:"imageUrl"`
+	Currency                 string `json:"currency"`
+	SameStorePrice           bool   `json:"sameStorePrice"`
+	ProductsCount            int    `json:"productsCount"`
+	Closed                   bool   `json:"closed"`
+	OpensAt                  string `json:"opensAt"`
 }
 
 func GetServices(countryCode string, latitude float32, longitude float32) (*[]Service, error) {
@@ -36,4 +66,25 @@ func GetServices(countryCode string, latitude float32, longitude float32) (*[]Se
 		return nil, err
 	}
 	return &services, nil
+}
+
+func GetBrands(countryCode string, service string, latitude float32, longitude float32) (*Brands, error) {
+	client := http.Client{}
+	url := fmt.Sprintf("https://core.honestbee.com/api/brands?countryCode=%s&page=1&page_size=6&serviceType=%s&latitude=%f&longitude=%f", countryCode, service, latitude, longitude)
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("Accept", "application/vnd.honestbee+json;version=2")
+	req.Header.Add("Accept-Language", "zh-TW")
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	brands := Brands{}
+	if err := jsoniter.NewDecoder(resp.Body).Decode(&brands); err != nil {
+		return nil, err
+	}
+	return &brands, nil
 }

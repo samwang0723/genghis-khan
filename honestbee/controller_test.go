@@ -14,3 +14,12 @@ func TestGetServices(t *testing.T) {
 	msg := fmt.Sprintf("Successfully retrieve %d services", len(*services))
 	t.Log(msg)
 }
+
+func TestGetBrands(t *testing.T) {
+	brands, err := GetBrands("TW", "groceries", 25.047571, 121.577812)
+	if err != nil {
+		t.Error(err.Error())
+	}
+	msg := fmt.Sprintf("Successfully retrieve %d brands", len(brands.Brands))
+	t.Log(msg)
+}
