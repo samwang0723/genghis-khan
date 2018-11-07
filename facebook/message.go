@@ -130,11 +130,10 @@ func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Resp
 	var replies []QuickReply
 	for _, service := range *services {
 		if service.Avaliable {
-			postback := fmt.Sprintf(`{"selectedService": "%s"}`, service.ServiceType)
 			replies = append(replies, QuickReply{
 				ContentType: "text",
 				Title:       service.ServiceType,
-				Payload:     postback,
+				Payload:     "selected_service",
 			})
 		}
 	}
