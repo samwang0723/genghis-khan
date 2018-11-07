@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -36,8 +37,9 @@ func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 }
 
 func postbackHandling(event facebook.Messaging) *facebook.Response {
-	if event.PostBack.Payload == "selected_service" {
-		brands, err := honestbee.GetBrands("TW", event.PostBack.Title, latitude, longitude)
+	data := strings.Split(event.PostBack.Payload, ":")
+	if data[0] == "brands" {
+		brands, err := honestbee.GetBrands("TW", data[2], data[1], latitude, longitude)
 		if err != nil {
 			str := fmt.Sprintf("No brand served in your location: %s", err.Error())
 			return facebook.ComposeText(event.Sender.ID, str)

@@ -133,7 +133,7 @@ func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Resp
 			buttons = append(buttons, Button{
 				Title:   service.ServiceType,
 				Type:    "postback",
-				Payload: "selected_service",
+				Payload: fmt.Sprintf("brands:%s", service.ServiceType),
 			})
 		}
 	}
@@ -207,6 +207,13 @@ func ComposeBrandList(event Messaging, brands honestbee.Brands) *Response {
 		})
 	}
 
+	var buttons []Button
+	buttons = append(buttons, Button{
+		Title:   "View More",
+		Type:    "postback",
+		Payload: fmt.Sprintf("brands:%s:%d", brands.Brands[0].ServiceType, brands.Meta.CurrentPage+1),
+	})
+
 	response := Response{
 		Recipient: User{
 			ID: event.Sender.ID,
@@ -218,6 +225,7 @@ func ComposeBrandList(event Messaging, brands honestbee.Brands) *Response {
 					TemplateType:    "list",
 					TopElementStyle: "compact",
 					Elements:        &elements,
+					Buttons:         &buttons,
 				},
 			},
 		},

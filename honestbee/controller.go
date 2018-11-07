@@ -68,9 +68,9 @@ func GetServices(countryCode string, latitude float32, longitude float32) (*[]Se
 	return &services, nil
 }
 
-func GetBrands(countryCode string, service string, latitude float32, longitude float32) (*Brands, error) {
+func GetBrands(countryCode string, page string, service string, latitude float32, longitude float32) (*Brands, error) {
 	client := http.Client{}
-	url := fmt.Sprintf("https://core.honestbee.com/api/brands?countryCode=%s&page=1&page_size=3&serviceType=%s&latitude=%f&longitude=%f", countryCode, service, latitude, longitude)
+	url := fmt.Sprintf("https://core.honestbee.com/api/brands?countryCode=%s&page=%s&page_size=3&serviceType=%s&latitude=%f&longitude=%f", countryCode, page, service, latitude, longitude)
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Accept", "application/vnd.honestbee+json;version=2")
 	req.Header.Add("Accept-Language", "zh-TW")
