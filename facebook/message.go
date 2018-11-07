@@ -28,6 +28,8 @@ type User struct {
 
 type QuickReply struct {
 	ContentType string `json:"content_type,omitempty"`
+	Title       string `json:"title,omitempty"`
+	ImageURL    string `json:"image_url,omitempty"`
 	Payload     string `json:"payload,omitempty"`
 }
 
@@ -117,13 +119,12 @@ func ParseLocation(event Messaging) *Coordinates {
 }
 
 func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Response {
-	var buttons []Button
+	var replies []QuickReply
 	for _, service := range *services {
 		if service.Avaliable {
-			buttons = append(buttons, Button{
-				Title:   service.ServiceType,
-				Type:    "postback",
-				Payload: service.ServiceType,
+			replies = append(replies, QuickReply{
+				ContentType: "text",
+				Title:       service.ServiceType,
 			})
 		}
 	}
@@ -133,14 +134,8 @@ func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Resp
 			ID: SenderID,
 		},
 		Message: Message{
-			Attachment: &Attachment{
-				Type: "template",
-				Payload: Payload{
-					TemplateType: "button",
-					Text:         "These are the available services",
-					Buttons:      &buttons,
-				},
-			},
+			Text:         "These are the available services:",
+			QuickReplies: &replies,
 		},
 	}
 	return &response
