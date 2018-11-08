@@ -207,11 +207,16 @@ func ComposeBrandList(event Messaging, brands honestbee.Brands) *Response {
 		})
 	}
 
+	nextPage := brands.Meta.CurrentPage + 1
+	if brands.Meta.TotalPages < brands.Meta.CurrentPage-1 {
+		nextPage = brands.Meta.TotalPages - 1
+	}
+
 	var buttons []Button
 	buttons = append(buttons, Button{
 		Title:   "View More",
 		Type:    "postback",
-		Payload: fmt.Sprintf("brands:%s:%d", brands.Brands[0].ServiceType, brands.Meta.CurrentPage+1),
+		Payload: fmt.Sprintf("brands:%s:%d", brands.Brands[0].ServiceType, nextPage),
 	})
 
 	response := Response{
