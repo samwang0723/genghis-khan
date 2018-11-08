@@ -68,6 +68,31 @@ type Departments struct {
 	Departments []Department `json:"departments"`
 }
 
+type Products struct {
+	Products *[]Product `json:"products"`
+}
+
+type Product struct {
+	ID               int    `json:"id"`
+	Title            string `json:"title"`
+	Description      string `json:"description"`
+	ImageURL         string `json:"imageUrl"`
+	PreviewImageURL  string `json:"previewImageUrl"`
+	ImageURLBasename string `json:"imageUrlBasename"`
+	Currency         string `json:"currency"`
+	MaxQuantity      string `json:"maxQuantity"`
+	Slug             string `json:"slug"`
+	UnitType         string `json:"unitType"`
+	SoldBy           string `json:"soldBy"`
+	AmountPerUnit    string `json:"amountPerUnit"`
+	Size             string `json:"size"`
+	Status           string `json:"status"`
+	Price            string `json:"price"`
+	NormalPrice      string `json:"normalPrice"`
+	PackingSize      string `json:"packingSize"`
+	Alcohol          string `json:"alcohol"`
+}
+
 func GetServices(countryCode string, latitude float32, longitude float32) (*[]Service, error) {
 	client := http.Client{}
 	url := fmt.Sprintf("https://core.honestbee.com/api/countries/%s/available_services?latitude=%f&longitude=%f", countryCode, latitude, longitude)
@@ -129,4 +154,25 @@ func GetDepartments(storeID string, latitude float32, longitude float32) (*Depar
 		return nil, err
 	}
 	return &departments, nil
+}
+
+func GetProducts(departmentID string) (*Products, error) {
+	client := http.Client{}
+	url := fmt.Sprintf("https://core.honestbee.com/api/departments/%s?page=1&pageSize=10&sort=ranking", departmentID)
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("Accept", "application/vnd.honestbee+json;version=2")
+	req.Header.Add("Accept-Language", "zh-TW")
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	products := Products{}
+	if err := jsoniter.NewDecoder(resp.Body).Decode(&products); err != nil {
+		return nil, err
+	}
+	return &products, nil
 }

@@ -186,6 +186,39 @@ func ComposeText(senderID string, message string) *Response {
 	return &response
 }
 
+func ComposeProductList(senderID string, products honestbee.Products) *Response {
+	var elements []Element
+	for _, product := range *products.Products {
+		var buttons []Button
+		buttons = append(buttons, Button{
+			Title:   "Buy",
+			Type:    "postback",
+			Payload: fmt.Sprintf("product:%d", product.ID),
+		})
+		elements = append(elements, Element{
+			Title:    product.Title,
+			SubTitle: product.Description,
+			ImageURL: product.PreviewImageURL,
+			Buttons:  &buttons,
+		})
+	}
+	response := Response{
+		Recipient: User{
+			ID: senderID,
+		},
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "template",
+				Payload: Payload{
+					TemplateType: "generic",
+					Elements:     &elements,
+				},
+			},
+		},
+	}
+	return &response
+}
+
 func ComposeDepartmentList(senderID string, departments honestbee.Departments) *Response {
 	index := 1
 	var buttons []Button
@@ -193,7 +226,7 @@ func ComposeDepartmentList(senderID string, departments honestbee.Departments) *
 		buttons = append(buttons, Button{
 			Title:   department.Name,
 			Type:    "postback",
-			Payload: fmt.Sprintf("department:%d", department.ID),
+			Payload: fmt.Sprintf("products:%d", department.ID),
 		})
 		index = index + 1
 		if index >= 3 {

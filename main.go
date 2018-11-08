@@ -53,8 +53,13 @@ func postbackHandling(event facebook.Messaging) *facebook.Response {
 			return facebook.ComposeText(event.Sender.ID, str)
 		}
 		return facebook.ComposeDepartmentList(event.Sender.ID, *departments)
-	case "department":
-
+	case "products":
+		products, err := honestbee.GetProducts(data[1])
+		if err != nil {
+			str := fmt.Sprintf("No products found: %s", err.Error())
+			return facebook.ComposeText(event.Sender.ID, str)
+		}
+		return facebook.ComposeProductList(event.Sender.ID, *products)
 	}
 	return nil
 }
