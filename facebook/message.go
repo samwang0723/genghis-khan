@@ -186,18 +186,43 @@ func ComposeText(senderID string, message string) *Response {
 	return &response
 }
 
+func ComposeDepartmentList(senderID string, departments honestbee.Departments) *Response {
+	var buttons []Button
+	for _, department := range departments.Departments {
+		buttons = append(buttons, Button{
+			Title:   department.Name,
+			Type:    "postback",
+			Payload: fmt.Sprintf("department:%d", department.ID),
+		})
+	}
+
+	response := Response{
+		Recipient: User{
+			ID: senderID,
+		},
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "template",
+				Payload: Payload{
+					TemplateType: "button",
+					Text:         "Please choose one of the departments",
+					Buttons:      &buttons,
+				},
+			},
+		},
+	}
+	return &response
+}
+
 //ComposeBrandList - response with brand list
 func ComposeBrandList(event Messaging, brands honestbee.Brands) *Response {
 	var elements []Element
 	for _, brand := range brands.Brands {
-		brandURL := fmt.Sprintf("https://www.honestbee.tw/zh-TW/%s/stores/%s", brand.ServiceType, brand.Slug)
 		var buttons []Button
 		buttons = append(buttons, Button{
-			Title:               "View",
-			Type:                "web_url",
-			URL:                 brandURL,
-			MessengerExtensions: true,
-			WebViewHeightRatio:  "tall",
+			Title:   "View",
+			Type:    "postback",
+			Payload: fmt.Sprintf("departments:%d", brand.StoreID),
 		})
 		elements = append(elements, Element{
 			Title:    brand.Name,

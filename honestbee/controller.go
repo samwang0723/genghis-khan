@@ -47,6 +47,27 @@ type Brand struct {
 	OpensAt                  string `json:"opensAt"`
 }
 
+type Category struct {
+	ID            int    `json:"id"`
+	Title         string `json:"title"`
+	Slug          string `json:"slug"`
+	ImageURL      string `json:"imageUrl"`
+	ProductsCount int    `json:"productsCount"`
+}
+
+type Department struct {
+	ID            int         `json:"id"`
+	Name          string      `json:"name"`
+	Description   string      `json:"description"`
+	ImageURL      string      `json:"imageUrl"`
+	ProductsCount int         `json:"productsCount"`
+	Categories    *[]Category `json:"categories"`
+}
+
+type Departments struct {
+	Departments []Department `json:"departments"`
+}
+
 func GetServices(countryCode string, latitude float32, longitude float32) (*[]Service, error) {
 	client := http.Client{}
 	url := fmt.Sprintf("https://core.honestbee.com/api/countries/%s/available_services?latitude=%f&longitude=%f", countryCode, latitude, longitude)
@@ -87,4 +108,25 @@ func GetBrands(countryCode string, page string, service string, latitude float32
 		return nil, err
 	}
 	return &brands, nil
+}
+
+func GetDepartments(storeID string, latitude float32, longitude float32) (*Departments, error) {
+	client := http.Client{}
+	url := fmt.Sprintf("https://core.honestbee.com/api/stores/%d/directory?latitude=%f&longitude=%f", storeID, latitude, longitude)
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Header.Add("Accept", "application/vnd.honestbee+json;version=2")
+	req.Header.Add("Accept-Language", "zh-TW")
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	departments := Departments{}
+	if err := jsoniter.NewDecoder(resp.Body).Decode(&departments); err != nil {
+		return nil, err
+	}
+	return &departments, nil
 }

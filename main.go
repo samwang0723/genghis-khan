@@ -38,13 +38,23 @@ func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 
 func postbackHandling(event facebook.Messaging) *facebook.Response {
 	data := strings.Split(event.PostBack.Payload, ":")
-	if data[0] == "brands" {
+	switch data[0] {
+	case "brands":
 		brands, err := honestbee.GetBrands("TW", data[2], data[1], latitude, longitude)
 		if err != nil {
 			str := fmt.Sprintf("No brand served in your location: %s", err.Error())
 			return facebook.ComposeText(event.Sender.ID, str)
 		}
 		return facebook.ComposeBrandList(event, *brands)
+	case "departments":
+		departments, err := honestbee.GetDepartments(data[1], latitude, longitude)
+		if err != nil {
+			str := fmt.Sprintf("No departments found: %s", err.Error())
+			return facebook.ComposeText(event.Sender.ID, str)
+		}
+		return facebook.ComposeDepartmentList(event.Sender.ID, *departments)
+	case "department":
+
 	}
 	return nil
 }
