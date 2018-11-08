@@ -196,7 +196,7 @@ func ComposeDepartmentList(senderID string, departments honestbee.Departments) *
 			Payload: fmt.Sprintf("department:%d", department.ID),
 		})
 		index = index + 1
-		if index >= 5 {
+		if index >= 3 {
 			break
 		}
 	}
