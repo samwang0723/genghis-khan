@@ -191,13 +191,13 @@ func ComposeProductList(senderID string, products honestbee.Products) *Response 
 	for _, product := range *products.Products {
 		var buttons []Button
 		buttons = append(buttons, Button{
-			Title:   "Buy",
+			Title:   fmt.Sprintf("Buy (%s)", product.Price),
 			Type:    "postback",
 			Payload: fmt.Sprintf("product:%d", product.ID),
 		})
 		elements = append(elements, Element{
 			Title:    product.Title,
-			SubTitle: product.Description,
+			SubTitle: product.Size,
 			ImageURL: product.PreviewImageURL,
 			Buttons:  &buttons,
 		})
