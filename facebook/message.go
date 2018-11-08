@@ -187,6 +187,7 @@ func ComposeText(senderID string, message string) *Response {
 }
 
 func ComposeDepartmentList(senderID string, departments honestbee.Departments) *Response {
+	index := 1
 	var buttons []Button
 	for _, department := range departments.Departments {
 		buttons = append(buttons, Button{
@@ -194,6 +195,10 @@ func ComposeDepartmentList(senderID string, departments honestbee.Departments) *
 			Type:    "postback",
 			Payload: fmt.Sprintf("department:%d", department.ID),
 		})
+		index = index + 1
+		if index >= 5 {
+			break
+		}
 	}
 
 	response := Response{
