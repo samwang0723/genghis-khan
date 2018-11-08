@@ -16,10 +16,19 @@ func TestGetServices(t *testing.T) {
 }
 
 func TestGetBrands(t *testing.T) {
-	brands, err := GetBrands("TW", "groceries", 25.047571, 121.577812)
+	brands, err := GetBrands("TW", "1", "groceries", 25.047571, 121.577812)
 	if err != nil {
 		t.Error(err.Error())
 	}
 	msg := fmt.Sprintf("Successfully retrieve %d brands", len(brands.Brands))
+	t.Log(msg)
+}
+
+func TestGetProducts(t *testing.T) {
+	products, err := GetProducts("47306")
+	if err != nil {
+		t.Error(err.Error())
+	}
+	msg := fmt.Sprintf("Successfully retrieve %d products", len(*products.Products))
 	t.Log(msg)
 }

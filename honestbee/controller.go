@@ -90,7 +90,7 @@ type Product struct {
 	Price            string `json:"price"`
 	NormalPrice      string `json:"normalPrice"`
 	PackingSize      string `json:"packingSize"`
-	Alcohol          string `json:"alcohol"`
+	Alcohol          bool   `json:"alcohol"`
 }
 
 func GetServices(countryCode string, latitude float32, longitude float32) (*[]Service, error) {
