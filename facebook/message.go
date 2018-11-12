@@ -93,13 +93,14 @@ type Element struct {
 }
 
 type Payload struct {
-	URL             string       `json:"url,omitempty"`
-	Text            string       `json:"text,omitempty"`
-	TemplateType    string       `json:"template_type,omitempty"`
-	TopElementStyle string       `json:"top_element_style,omitempty"` // large, compact
-	Coordinates     *Coordinates `json:"coordinates,omitempty"`
-	Elements        *[]Element   `json:"elements,omitempty"`
-	Buttons         *[]Button    `json:"buttons,omitempty"`
+	URL              string       `json:"url,omitempty"`
+	Text             string       `json:"text,omitempty"`
+	TemplateType     string       `json:"template_type,omitempty"`
+	ImageAspectRatio string       `json:"image_aspect_ratio,omitempty"`
+	TopElementStyle  string       `json:"top_element_style,omitempty"` // large, compact
+	Coordinates      *Coordinates `json:"coordinates,omitempty"`
+	Elements         *[]Element   `json:"elements,omitempty"`
+	Buttons          *[]Button    `json:"buttons,omitempty"`
 }
 
 // SenderTypingAction - response with typing actions
@@ -214,18 +215,20 @@ func ComposeText(senderID string, message string) *Response {
 func ComposeProductList(senderID string, products honestbee.Products) *Response {
 	var elements []Element
 	for _, product := range *products.Products {
-		var buttons []Button
-		buttons = append(buttons, Button{
-			Title:   fmt.Sprintf("Buy (%s)", product.Price),
-			Type:    "postback",
-			Payload: fmt.Sprintf("%s:%d", honestbee.PRODUCT, product.ID),
-		})
-		elements = append(elements, Element{
-			Title:    product.Title,
-			SubTitle: product.Size,
-			ImageURL: product.PreviewImageURL,
-			Buttons:  &buttons,
-		})
+		if product.Status == honestbee.STATUS_AVAILABLE {
+			var buttons []Button
+			buttons = append(buttons, Button{
+				Title:   "Shop Now",
+				Type:    "postback",
+				Payload: fmt.Sprintf("%s:%d", honestbee.BUY_PRODUCT, product.ID),
+			})
+			elements = append(elements, Element{
+				Title:    product.Title,
+				SubTitle: fmt.Sprintf("%s\n$%s", product.Size, product.Price),
+				ImageURL: product.ImageURL,
+				Buttons:  &buttons,
+			})
+		}
 	}
 	response := Response{
 		Recipient: User{
@@ -235,8 +238,9 @@ func ComposeProductList(senderID string, products honestbee.Products) *Response 
 			Attachment: &Attachment{
 				Type: "template",
 				Payload: Payload{
-					TemplateType: "generic",
-					Elements:     &elements,
+					TemplateType:     "generic",
+					ImageAspectRatio: "square",
+					Elements:         &elements,
 				},
 			},
 		},

@@ -106,15 +106,16 @@ type SearchQuery struct {
 const BRANDS = "brands"
 const DEPARTMENTS = "departments"
 const PRODUCTS = "products"
-const PRODUCT = "product"
+const BUY_PRODUCT = "buy_product"
 const SEARCH = "search"
 const LOGIN_URL = "https://tranquil-anglerfish.glitch.me/login"
+const STATUS_AVAILABLE = "status_available"
 
 func SearchProducts(storeID string, query string) (*Products, error) {
 	client := http.Client{}
 	url := fmt.Sprintf("https://core.honestbee.com/api/stores/%s", storeID)
 
-	queryJson := SearchQuery{
+	queryJSON := SearchQuery{
 		Page:     1,
 		PageSize: 4,
 		Platform: "iOS",
@@ -122,7 +123,7 @@ func SearchProducts(storeID string, query string) (*Products, error) {
 		UserID:   "",
 		UUID:     "508786e0-57b8-4252-87d6-13295a81733a",
 	}
-	data, err := jsoniter.Marshal(queryJson)
+	data, err := jsoniter.Marshal(queryJSON)
 	if err != nil {
 		return nil, err
 	}
