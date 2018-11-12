@@ -24,6 +24,15 @@ func TestGetBrands(t *testing.T) {
 	t.Log(msg)
 }
 
+func TestGetDepartments(t *testing.T) {
+	departments, err := GetDepartments("11150", 25.047571, 121.577812)
+	if err != nil {
+		t.Error(err.Error())
+	}
+	msg := fmt.Sprintf("Successfully retrieve %d departments", len(departments.Departments))
+	t.Log(msg)
+}
+
 func TestGetProducts(t *testing.T) {
 	products, err := GetProducts("47306")
 	if err != nil {

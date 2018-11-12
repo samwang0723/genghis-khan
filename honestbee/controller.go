@@ -93,6 +93,10 @@ type Product struct {
 	Alcohol          bool   `json:"alcohol"`
 }
 
+const BRANDS = "brands"
+const DEPARTMENTS = "departments"
+const PRODUCTS = "products"
+
 func GetServices(countryCode string, latitude float32, longitude float32) (*[]Service, error) {
 	client := http.Client{}
 	url := fmt.Sprintf("https://core.honestbee.com/api/countries/%s/available_services?latitude=%f&longitude=%f", countryCode, latitude, longitude)

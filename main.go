@@ -39,21 +39,21 @@ func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 func postbackHandling(event facebook.Messaging) *facebook.Response {
 	data := strings.Split(event.PostBack.Payload, ":")
 	switch data[0] {
-	case "brands":
+	case honestbee.BRANDS:
 		brands, err := honestbee.GetBrands("TW", data[2], data[1], latitude, longitude)
 		if err != nil {
 			str := fmt.Sprintf("No brand served in your location: %s", err.Error())
 			return facebook.ComposeText(event.Sender.ID, str)
 		}
 		return facebook.ComposeBrandList(event, *brands)
-	case "departments":
+	case honestbee.DEPARTMENTS:
 		departments, err := honestbee.GetDepartments(data[1], latitude, longitude)
 		if err != nil {
 			str := fmt.Sprintf("No departments found: %s", err.Error())
 			return facebook.ComposeText(event.Sender.ID, str)
 		}
 		return facebook.ComposeDepartmentList(event.Sender.ID, *departments)
-	case "products":
+	case honestbee.PRODUCTS:
 		products, err := honestbee.GetProducts(data[1])
 		if err != nil {
 			str := fmt.Sprintf("No products found: %s", err.Error())
@@ -154,7 +154,6 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/webhook", VerificationEndpoint).Methods("GET")
 	r.HandleFunc("/webhook", MessagesEndpoint).Methods("POST")
-	r.HandleFunc("/postback", MessagesEndpoint).Methods("POST")
 	if err := http.ListenAndServe(":"+port, r); err != nil {
 		log.Fatal(err)
 	}
