@@ -1,6 +1,7 @@
 package honestbee
 
 import (
+	"bytes"
 	"fmt"
 	"net/http"
 
@@ -93,10 +94,56 @@ type Product struct {
 	Alcohol          bool   `json:"alcohol"`
 }
 
+type SearchQuery struct {
+	Page     int    `json:"page,omitempty"`
+	PageSize int    `json:"pageSize,omitempty"`
+	Platform string `json:"platform,omitempty"`
+	Q        string `json:"q,omitempty"`
+	UserID   string `json:"userId,omitempty"`
+	UUID     string `json:"uuid,omitempty"`
+}
+
 const BRANDS = "brands"
 const DEPARTMENTS = "departments"
 const PRODUCTS = "products"
+const PRODUCT = "product"
+const SEARCH = "search"
 const LOGIN_URL = "https://tranquil-anglerfish.glitch.me/login"
+
+func SearchProducts(storeID string, query string) (*Products, error) {
+	client := http.Client{}
+	url := fmt.Sprintf("https://core.honestbee.com/api/stores/%s", storeID)
+
+	queryJson := SearchQuery{
+		Page:     1,
+		PageSize: 4,
+		Platform: "iOS",
+		Q:        query,
+		UserID:   "",
+		UUID:     "508786e0-57b8-4252-87d6-13295a81733a",
+	}
+	data, err := jsoniter.Marshal(queryJson)
+	if err != nil {
+		return nil, err
+	}
+
+	req, _ := http.NewRequest("GET", url, bytes.NewBuffer(data))
+	req.Header.Add("Accept", "application/vnd.honestbee+json;version=2")
+	req.Header.Add("Accept-Language", "zh-TW")
+	req.Header.Add("Content-Type", "application/json")
+
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	products := Products{}
+	if err := jsoniter.NewDecoder(resp.Body).Decode(&products); err != nil {
+		return nil, err
+	}
+	return &products, nil
+}
 
 func GetServices(countryCode string, latitude float32, longitude float32) (*[]Service, error) {
 	client := http.Client{}

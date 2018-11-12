@@ -158,7 +158,7 @@ func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Resp
 			buttons = append(buttons, Button{
 				Title:   service.ServiceType,
 				Type:    "postback",
-				Payload: fmt.Sprintf("brands:%s:1", service.ServiceType),
+				Payload: fmt.Sprintf("%s:%s:1", honestbee.BRANDS, service.ServiceType),
 			})
 		}
 	}
@@ -218,7 +218,7 @@ func ComposeProductList(senderID string, products honestbee.Products) *Response 
 		buttons = append(buttons, Button{
 			Title:   fmt.Sprintf("Buy (%s)", product.Price),
 			Type:    "postback",
-			Payload: fmt.Sprintf("product:%d", product.ID),
+			Payload: fmt.Sprintf("%s:%d", honestbee.PRODUCT, product.ID),
 		})
 		elements = append(elements, Element{
 			Title:    product.Title,
@@ -251,7 +251,7 @@ func ComposeDepartmentList(senderID string, departments honestbee.Departments) *
 		buttons = append(buttons, Button{
 			Title:   department.Name,
 			Type:    "postback",
-			Payload: fmt.Sprintf("products:%d", department.ID),
+			Payload: fmt.Sprintf("%s:%d", honestbee.PRODUCTS, department.ID),
 		})
 		index = index + 1
 		if index >= 3 {
@@ -283,9 +283,9 @@ func ComposeBrandList(event Messaging, brands honestbee.Brands) *Response {
 	for _, brand := range brands.Brands {
 		var buttons []Button
 		buttons = append(buttons, Button{
-			Title:   "View",
+			Title:   "Search",
 			Type:    "postback",
-			Payload: fmt.Sprintf("departments:%d", brand.StoreID),
+			Payload: fmt.Sprintf("%s:%d", honestbee.SEARCH, brand.StoreID),
 		})
 		elements = append(elements, Element{
 			Title:    brand.Name,
@@ -299,7 +299,7 @@ func ComposeBrandList(event Messaging, brands honestbee.Brands) *Response {
 	buttons = append(buttons, Button{
 		Title:   "View More",
 		Type:    "postback",
-		Payload: fmt.Sprintf("brands:%s:%d", brands.Brands[0].ServiceType, brands.Meta.CurrentPage+1),
+		Payload: fmt.Sprintf("%s:%s:%d", honestbee.BRANDS, brands.Brands[0].ServiceType, brands.Meta.CurrentPage+1),
 	})
 
 	response := Response{

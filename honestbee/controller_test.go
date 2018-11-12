@@ -41,3 +41,12 @@ func TestGetProducts(t *testing.T) {
 	msg := fmt.Sprintf("Successfully retrieve %d products", len(*products.Products))
 	t.Log(msg)
 }
+
+func TestSearchProducts(t *testing.T) {
+	products, err := SearchProducts("11150", "Apple")
+	if err != nil {
+		t.Error(err.Error())
+	}
+	msg := fmt.Sprintf("Successfully retrieve %d products", len(*products.Products))
+	t.Log(msg)
+}

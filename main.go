@@ -22,6 +22,7 @@ const (
 
 var latitude float32
 var longitude float32
+var currentQueryStoreID string
 
 func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("hub.challenge")
@@ -60,6 +61,10 @@ func postbackHandling(event facebook.Messaging) *facebook.Response {
 			return facebook.ComposeText(event.Sender.ID, str)
 		}
 		return facebook.ComposeProductList(event.Sender.ID, *products)
+	case honestbee.SEARCH:
+		currentQueryStoreID = data[1]
+		str := fmt.Sprintf("We've selected store %s, please type search keywords", currentQueryStoreID)
+		facebook.ComposeText(event.Sender.ID, str)
 	}
 	return nil
 }
@@ -74,6 +79,15 @@ func keywordFilters(event facebook.Messaging) *facebook.Response {
 		return facebook.ComposeLocation(event)
 	case "login":
 		return facebook.Login(event.Sender.ID)
+	}
+
+	if len(currentQueryStoreID) != 0 {
+		products, err := honestbee.SearchProducts(currentQueryStoreID, event.Message.Text)
+		if err != nil {
+			str := fmt.Sprintf("No products found: %s", err.Error())
+			return facebook.ComposeText(event.Sender.ID, str)
+		}
+		return facebook.ComposeProductList(event.Sender.ID, *products)
 	}
 
 	coordinates := facebook.ParseLocation(event)
