@@ -283,7 +283,7 @@ func ComposeBrandList(event Messaging, brands honestbee.Brands) *Response {
 	for _, brand := range brands.Brands {
 		var buttons []Button
 		buttons = append(buttons, Button{
-			Title:   "Search",
+			Title:   "Browse",
 			Type:    "postback",
 			Payload: fmt.Sprintf("%s:%d", honestbee.SEARCH, brand.StoreID),
 		})

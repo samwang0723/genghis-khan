@@ -64,7 +64,7 @@ func postbackHandling(event facebook.Messaging) *facebook.Response {
 	case honestbee.SEARCH:
 		currentQueryStoreID = data[1]
 		str := fmt.Sprintf("We've selected store %s, please type search keywords", currentQueryStoreID)
-		facebook.ComposeText(event.Sender.ID, str)
+		return facebook.ComposeText(event.Sender.ID, str)
 	}
 	return nil
 }
