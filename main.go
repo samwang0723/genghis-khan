@@ -72,6 +72,8 @@ func postbackHandling(event facebook.Messaging) *facebook.Response {
 func keywordFilters(event facebook.Messaging) *facebook.Response {
 	if event.PostBack != nil {
 		return postbackHandling(event)
+	} else if event.AccountLinking != nil {
+		return facebook.ComposeText(event.Sender.ID, event.AccountLinking.AuthorizationCode)
 	}
 
 	switch event.Message.Text {

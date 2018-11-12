@@ -16,11 +16,12 @@ type Callback struct {
 }
 
 type Messaging struct {
-	Sender    User      `json:"sender,omitempty"`
-	Recipient User      `json:"recipient,omitempty"`
-	Timestamp int       `json:"timestamp,omitempty"`
-	Message   Message   `json:"message,omitempty"`
-	PostBack  *PostBack `json:"postback,omitempty"`
+	Sender         User            `json:"sender,omitempty"`
+	Recipient      User            `json:"recipient,omitempty"`
+	Timestamp      int             `json:"timestamp,omitempty"`
+	Message        Message         `json:"message,omitempty"`
+	PostBack       *PostBack       `json:"postback,omitempty"`
+	AccountLinking *AccountLinking `json:"account_linking,omitempty"`
 }
 
 type PostBack struct {
@@ -60,6 +61,11 @@ type Response struct {
 type ActionResponse struct {
 	Recipient    User   `json:"recipient,omitempty"`
 	SenderAction string `json:"sender_action,omitempty"`
+}
+
+type AccountLinking struct {
+	AuthorizationCode string `json:"authorization_code,omitempty"`
+	Status            string `json:"status,omitempty"`
 }
 
 type Coordinates struct {
@@ -224,8 +230,8 @@ func ComposeProductList(senderID string, products honestbee.Products) *Response 
 			})
 			elements = append(elements, Element{
 				Title:    product.Title,
-				SubTitle: fmt.Sprintf("%s\n$%s", product.Size, product.Price),
-				ImageURL: product.ImageURL,
+				SubTitle: fmt.Sprintf("%s (%s)\n$%s", product.ProductBrand, product.Size, product.Price),
+				ImageURL: fmt.Sprintf("https://assets.honestbee.com/products/images/480/%s", product.ImageURLBasename),
 				Buttons:  &buttons,
 			})
 		}

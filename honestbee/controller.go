@@ -92,6 +92,7 @@ type Product struct {
 	NormalPrice      string `json:"normalPrice"`
 	PackingSize      string `json:"packingSize"`
 	Alcohol          bool   `json:"alcohol"`
+	ProductBrand     string `json:"productBrand"`
 }
 
 type SearchQuery struct {
