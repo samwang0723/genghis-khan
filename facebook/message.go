@@ -126,6 +126,31 @@ func ParseLocation(event Messaging) *Coordinates {
 	return nil
 }
 
+func Login(SenderID string) *Response {
+	var buttons []Button
+	buttons = append(buttons, Button{
+		Type: "account_link",
+		URL:  honestbee.LOGIN_URL,
+	})
+
+	response := Response{
+		Recipient: User{
+			ID: SenderID,
+		},
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "template",
+				Payload: Payload{
+					TemplateType: "button",
+					Text:         "Please login to have better shopping experience",
+					Buttons:      &buttons,
+				},
+			},
+		},
+	}
+	return &response
+}
+
 func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Response {
 	var buttons []Button
 	for _, service := range *services {

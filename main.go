@@ -72,6 +72,8 @@ func keywordFilters(event facebook.Messaging) *facebook.Response {
 	switch event.Message.Text {
 	case "get_location":
 		return facebook.ComposeLocation(event)
+	case "login":
+		return facebook.Login(event.Sender.ID)
 	}
 
 	coordinates := facebook.ParseLocation(event)

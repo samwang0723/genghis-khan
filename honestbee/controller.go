@@ -96,6 +96,7 @@ type Product struct {
 const BRANDS = "brands"
 const DEPARTMENTS = "departments"
 const PRODUCTS = "products"
+const LOGIN_URL = "https://tranquil-anglerfish.glitch.me/login"
 
 func GetServices(countryCode string, latitude float32, longitude float32) (*[]Service, error) {
 	client := http.Client{}
