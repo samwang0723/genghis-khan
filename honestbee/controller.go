@@ -124,7 +124,7 @@ func SearchProducts(storeID string, query string) (*Products, error) {
 
 	queryJSON := SearchQuery{
 		Page:     1,
-		PageSize: 4,
+		PageSize: 10,
 		Platform: "iOS",
 		Q:        query,
 		UserID:   "",
