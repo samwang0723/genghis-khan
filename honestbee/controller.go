@@ -2,6 +2,7 @@ package honestbee
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -104,6 +105,11 @@ type SearchQuery struct {
 	UUID     string `json:"uuid,omitempty"`
 }
 
+type Location struct {
+	Latitude  float32 `json:"latitude"`
+	Longitude float32 `json:"longitude"`
+}
+
 const BRANDS = "brands"
 const DEPARTMENTS = "departments"
 const PRODUCTS = "products"
@@ -147,9 +153,13 @@ func SearchProducts(storeID string, query string) (*Products, error) {
 	return &products, nil
 }
 
-func GetServices(countryCode string, latitude float32, longitude float32) (*[]Service, error) {
+func GetServices(countryCode string, location *Location) (*[]Service, error) {
+	if location == nil {
+		return nil, errors.New("No location provided")
+	}
+
 	client := http.Client{}
-	url := fmt.Sprintf("https://core.honestbee.com/api/countries/%s/available_services?latitude=%f&longitude=%f", countryCode, latitude, longitude)
+	url := fmt.Sprintf("https://core.honestbee.com/api/countries/%s/available_services?latitude=%f&longitude=%f", countryCode, location.Latitude, location.Longitude)
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Accept", "application/vnd.honestbee+json;version=1")
 	req.Header.Add("Accept-Language", "zh-TW")
@@ -168,9 +178,13 @@ func GetServices(countryCode string, latitude float32, longitude float32) (*[]Se
 	return &services, nil
 }
 
-func GetBrands(countryCode string, page string, service string, latitude float32, longitude float32) (*Brands, error) {
+func GetBrands(countryCode string, page string, service string, location *Location) (*Brands, error) {
+	if location == nil {
+		return nil, errors.New("No location provided")
+	}
+
 	client := http.Client{}
-	url := fmt.Sprintf("https://core.honestbee.com/api/brands?countryCode=%s&page=%s&page_size=3&serviceType=%s&latitude=%f&longitude=%f", countryCode, page, service, latitude, longitude)
+	url := fmt.Sprintf("https://core.honestbee.com/api/brands?countryCode=%s&page=%s&page_size=3&serviceType=%s&latitude=%f&longitude=%f", countryCode, page, service, location.Latitude, location.Longitude)
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Accept", "application/vnd.honestbee+json;version=2")
 	req.Header.Add("Accept-Language", "zh-TW")
@@ -189,9 +203,13 @@ func GetBrands(countryCode string, page string, service string, latitude float32
 	return &brands, nil
 }
 
-func GetDepartments(storeID string, latitude float32, longitude float32) (*Departments, error) {
+func GetDepartments(storeID string, location *Location) (*Departments, error) {
+	if location == nil {
+		return nil, errors.New("No location provided")
+	}
+
 	client := http.Client{}
-	url := fmt.Sprintf("https://core.honestbee.com/api/stores/%s/directory?latitude=%f&longitude=%f", storeID, latitude, longitude)
+	url := fmt.Sprintf("https://core.honestbee.com/api/stores/%s/directory?latitude=%f&longitude=%f", storeID, location.Latitude, location.Longitude)
 	req, _ := http.NewRequest("GET", url, nil)
 	req.Header.Add("Accept", "application/vnd.honestbee+json;version=2")
 	req.Header.Add("Accept-Language", "zh-TW")

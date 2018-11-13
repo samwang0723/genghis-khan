@@ -2,13 +2,19 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
+
+	jsoniter "github.com/json-iterator/go"
+	"github.com/samwang0723/genghis-khan/utils"
 
 	"github.com/gorilla/mux"
 	"github.com/samwang0723/genghis-khan/facebook"
@@ -20,8 +26,6 @@ const (
 	IMAGE        = "http://37.media.tumblr.com/e705e901302b5925ffb2bcf3cacb5bcd/tumblr_n6vxziSQD11slv6upo3_500.gif"
 )
 
-var latitude float32
-var longitude float32
 var currentQueryStoreID string
 
 func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
@@ -37,18 +41,30 @@ func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func getLocation(SenderID string) *honestbee.Location {
+	key := fmt.Sprintf("location_%s", SenderID)
+	val, err := utils.RedisClient().Get(key).Result()
+	if err == nil {
+		location := new(honestbee.Location)
+		jsoniter.UnmarshalFromString(val, &location)
+		return location
+	}
+	return nil
+}
+
 func postbackHandling(event facebook.Messaging) *facebook.Response {
+	location := getLocation(event.Sender.ID)
 	data := strings.Split(event.PostBack.Payload, ":")
 	switch data[0] {
 	case honestbee.BRANDS:
-		brands, err := honestbee.GetBrands("TW", data[2], data[1], latitude, longitude)
+		brands, err := honestbee.GetBrands("TW", data[2], data[1], location)
 		if err != nil {
 			str := fmt.Sprintf("No brand served in your location: %s", err.Error())
 			return facebook.ComposeText(event.Sender.ID, str)
 		}
 		return facebook.ComposeBrandList(event, *brands)
 	case honestbee.DEPARTMENTS:
-		departments, err := honestbee.GetDepartments(data[1], latitude, longitude)
+		departments, err := honestbee.GetDepartments(data[1], location)
 		if err != nil {
 			str := fmt.Sprintf("No departments found: %s", err.Error())
 			return facebook.ComposeText(event.Sender.ID, str)
@@ -73,6 +89,12 @@ func keywordFilters(event facebook.Messaging) *facebook.Response {
 	if event.PostBack != nil {
 		return postbackHandling(event)
 	} else if event.AccountLinking != nil {
+		key := fmt.Sprintf("login_%s", event.Sender.ID)
+		err := utils.RedisClient().Set(key, event.AccountLinking.AuthorizationCode, 0).Err()
+		if err != nil {
+			str := fmt.Sprintf("Session store error: %s", err.Error())
+			return facebook.ComposeText(event.Sender.ID, str)
+		}
 		return facebook.ComposeText(event.Sender.ID, event.AccountLinking.AuthorizationCode)
 	}
 
@@ -99,8 +121,13 @@ func keywordFilters(event facebook.Messaging) *facebook.Response {
 			str := fmt.Sprintf("Cannot read services: %s", err.Error())
 			return facebook.ComposeText(event.Sender.ID, str)
 		}
-		latitude = coordinates.Lat
-		longitude = coordinates.Long
+		key := fmt.Sprintf("location_%s", event.Sender.ID)
+		json := fmt.Sprintf(`{"latitude":%f,"longitude":%f}`, coordinates.Lat, coordinates.Long)
+		err = utils.RedisClient().Set(key, json, 0).Err()
+		if err != nil {
+			str := fmt.Sprintf("Location store error: %s", err.Error())
+			return facebook.ComposeText(event.Sender.ID, str)
+		}
 		return facebook.ComposeServicesButton(event.Sender.ID, services)
 	}
 
@@ -169,10 +196,36 @@ func main() {
 		log.Fatal("$PORT must be set")
 	}
 
-	r := mux.NewRouter()
-	r.HandleFunc("/webhook", VerificationEndpoint).Methods("GET")
-	r.HandleFunc("/webhook", MessagesEndpoint).Methods("POST")
-	if err := http.ListenAndServe(":"+port, r); err != nil {
-		log.Fatal(err)
+	router := mux.NewRouter()
+	router.HandleFunc("/webhook", VerificationEndpoint).Methods("GET")
+	router.HandleFunc("/webhook", MessagesEndpoint).Methods("POST")
+
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: router,
 	}
+
+	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen: %s\n", err)
+		}
+	}()
+	log.Print("Server Started")
+
+	<-done
+	log.Print("Server Stopped")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer func() {
+		utils.RedisClient().Close() //FIXME: What if still have pending tasks
+		cancel()
+	}()
+
+	if err := srv.Shutdown(ctx); err != nil {
+		log.Fatalf("Server Shutdown Failed:%+v", err)
+	}
+	log.Print("Server Exited Properly")
 }
