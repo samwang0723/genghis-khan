@@ -116,7 +116,11 @@ func keywordFilters(event facebook.Messaging) *facebook.Response {
 
 	coordinates := facebook.ParseLocation(event)
 	if coordinates != nil {
-		services, err := honestbee.GetServices("TW", coordinates.Lat, coordinates.Long)
+		location := &honestbee.Location{
+			Latitude:  coordinates.Lat,
+			Longitude: coordinates.Long,
+		}
+		services, err := honestbee.GetServices("TW", location)
 		if err != nil {
 			str := fmt.Sprintf("Cannot read services: %s", err.Error())
 			return facebook.ComposeText(event.Sender.ID, str)
