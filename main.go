@@ -37,7 +37,7 @@ func MessagesEndpoint(w http.ResponseWriter, r *http.Request) {
 	if callback.Object == "page" {
 		for _, entry := range callback.Entry {
 			for _, event := range entry.Messaging {
-				facebook.ProcessMessage(event)
+				event.Process()
 			}
 		}
 		w.WriteHeader(200)

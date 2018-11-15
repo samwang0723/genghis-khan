@@ -22,8 +22,7 @@ type QueryError struct {
 	FBTraceID    string `json:"fbtrace_id"`
 }
 
-// CheckFacebookError parse error response
-func CheckFacebookError(r io.Reader) error {
+func readFacebookError(r io.Reader) error {
 	var err error
 	qr := QueryResponse{}
 	err = json.NewDecoder(r).Decode(&qr)

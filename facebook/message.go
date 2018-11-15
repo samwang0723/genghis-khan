@@ -1,9 +1,12 @@
 package facebook
 
 import (
+	"errors"
 	"fmt"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/samwang0723/genghis-khan/honestbee"
+	"github.com/samwang0723/genghis-khan/utils"
 )
 
 type Callback struct {
@@ -109,8 +112,49 @@ type Payload struct {
 	Buttons          *[]Button    `json:"buttons,omitempty"`
 }
 
-// SenderTypingAction - response with typing actions
-func SenderTypingAction(event Messaging) *ActionResponse {
+func (event *Messaging) saveAccessToken() (string, error) {
+	key := fmt.Sprintf("login_%s", event.Sender.ID)
+	err := utils.RedisClient().Set(key, event.AccountLinking.AuthorizationCode, 0).Err()
+	if err != nil {
+		str := fmt.Sprintf("Session store error: %s", err.Error())
+		return "", errors.New(str)
+	}
+	return event.AccountLinking.AuthorizationCode, nil
+}
+
+func (event *Messaging) viewingStoreID() string {
+	key := fmt.Sprintf("viewing_store_%s", event.Sender.ID)
+	val, err := utils.RedisClient().Get(key).Result()
+	if err == nil {
+		return val
+	}
+	return ""
+}
+
+func (event *Messaging) saveViewingStoreID(storeID string) error {
+	key := fmt.Sprintf("viewing_store_%s", event.Sender.ID)
+	err := utils.RedisClient().Set(key, storeID, 0).Err()
+	return err
+}
+
+func (event *Messaging) location() *honestbee.Location {
+	key := fmt.Sprintf("location_%s", event.Sender.ID)
+	val, err := utils.RedisClient().Get(key).Result()
+	if err == nil {
+		location := new(honestbee.Location)
+		jsoniter.UnmarshalFromString(val, &location)
+		return location
+	}
+	return nil
+}
+
+func (event *Messaging) saveLocation(location *honestbee.Location) error {
+	key := fmt.Sprintf("location_%s", event.Sender.ID)
+	json := fmt.Sprintf(`{"latitude":%f,"longitude":%f}`, location.Latitude, location.Longitude)
+	return utils.RedisClient().Set(key, json, 0).Err()
+}
+
+func (event *Messaging) senderTypingAction() *ActionResponse {
 	response := ActionResponse{
 		Recipient: User{
 			ID: event.Sender.ID,
@@ -120,8 +164,7 @@ func SenderTypingAction(event Messaging) *ActionResponse {
 	return &response
 }
 
-// ParseLocation - parse latitude and longitude
-func ParseLocation(event Messaging) *Coordinates {
+func (event *Messaging) parseLocation() *Coordinates {
 	if event.Message.Attachments != nil {
 		for _, attachment := range *event.Message.Attachments {
 			coordinates := attachment.Payload.Coordinates
@@ -133,63 +176,7 @@ func ParseLocation(event Messaging) *Coordinates {
 	return nil
 }
 
-func Login(SenderID string) *Response {
-	var buttons []Button
-	buttons = append(buttons, Button{
-		Type: "account_link",
-		URL:  honestbee.LOGIN_URL,
-	})
-
-	response := Response{
-		Recipient: User{
-			ID: SenderID,
-		},
-		Message: Message{
-			Attachment: &Attachment{
-				Type: "template",
-				Payload: Payload{
-					TemplateType: "button",
-					Text:         "Please login to have better shopping experience",
-					Buttons:      &buttons,
-				},
-			},
-		},
-	}
-	return &response
-}
-
-func ListServices(SenderID string, services *[]honestbee.Service) *Response {
-	var buttons []Button
-	for _, service := range *services {
-		if service.Avaliable {
-			buttons = append(buttons, Button{
-				Title:   service.ServiceType,
-				Type:    "postback",
-				Payload: fmt.Sprintf("%s:%s:1", honestbee.BRANDS, service.ServiceType),
-			})
-		}
-	}
-
-	response := Response{
-		Recipient: User{
-			ID: SenderID,
-		},
-		Message: Message{
-			Attachment: &Attachment{
-				Type: "template",
-				Payload: Payload{
-					TemplateType: "button",
-					Text:         "These are the available services",
-					Buttons:      &buttons,
-				},
-			},
-		},
-	}
-	return &response
-}
-
-// AskLocation - response with location
-func AskLocation(event Messaging) *Response {
+func (event *Messaging) askLocation() *Response {
 	var replies []QuickReply
 	replies = append(replies, QuickReply{
 		ContentType: "location",
@@ -206,10 +193,65 @@ func AskLocation(event Messaging) *Response {
 	return &response
 }
 
-func ShowText(senderID string, message string) *Response {
+func (event *Messaging) login() *Response {
+	var buttons []Button
+	buttons = append(buttons, Button{
+		Type: "account_link",
+		URL:  honestbee.LOGIN_URL,
+	})
+
 	response := Response{
 		Recipient: User{
-			ID: senderID,
+			ID: event.Sender.ID,
+		},
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "template",
+				Payload: Payload{
+					TemplateType: "button",
+					Text:         "Please login to have better shopping experience",
+					Buttons:      &buttons,
+				},
+			},
+		},
+	}
+	return &response
+}
+
+func (event *Messaging) listServices(services *[]honestbee.Service) *Response {
+	var buttons []Button
+	for _, service := range *services {
+		if service.Avaliable {
+			buttons = append(buttons, Button{
+				Title:   service.ServiceType,
+				Type:    "postback",
+				Payload: fmt.Sprintf("%s:%s:1", honestbee.BRANDS, service.ServiceType),
+			})
+		}
+	}
+
+	response := Response{
+		Recipient: User{
+			ID: event.Sender.ID,
+		},
+		Message: Message{
+			Attachment: &Attachment{
+				Type: "template",
+				Payload: Payload{
+					TemplateType: "button",
+					Text:         "These are the available services",
+					Buttons:      &buttons,
+				},
+			},
+		},
+	}
+	return &response
+}
+
+func (event *Messaging) showText(message string) *Response {
+	response := Response{
+		Recipient: User{
+			ID: event.Sender.ID,
 		},
 		Message: Message{
 			Text: message,
@@ -218,7 +260,7 @@ func ShowText(senderID string, message string) *Response {
 	return &response
 }
 
-func ListProducts(senderID string, products honestbee.Products) *Response {
+func (event *Messaging) listProducts(products honestbee.Products) *Response {
 	var elements []Element
 	for _, product := range *products.Products {
 		if product.Status == honestbee.STATUS_AVAILABLE {
@@ -238,7 +280,7 @@ func ListProducts(senderID string, products honestbee.Products) *Response {
 	}
 	response := Response{
 		Recipient: User{
-			ID: senderID,
+			ID: event.Sender.ID,
 		},
 		Message: Message{
 			Attachment: &Attachment{
@@ -254,7 +296,7 @@ func ListProducts(senderID string, products honestbee.Products) *Response {
 	return &response
 }
 
-func ListDepartments(senderID string, departments honestbee.Departments) *Response {
+func (event *Messaging) listDepartments(departments honestbee.Departments) *Response {
 	index := 1
 	var buttons []Button
 	for _, department := range departments.Departments {
@@ -271,7 +313,7 @@ func ListDepartments(senderID string, departments honestbee.Departments) *Respon
 
 	response := Response{
 		Recipient: User{
-			ID: senderID,
+			ID: event.Sender.ID,
 		},
 		Message: Message{
 			Attachment: &Attachment{
@@ -287,8 +329,7 @@ func ListDepartments(senderID string, departments honestbee.Departments) *Respon
 	return &response
 }
 
-//ListBrands - response with brand list
-func ListBrands(event Messaging, brands honestbee.Brands) *Response {
+func (event *Messaging) listBrands(brands honestbee.Brands) *Response {
 	var elements []Element
 	for _, brand := range brands.Brands {
 		var buttons []Button
