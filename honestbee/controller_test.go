@@ -7,7 +7,11 @@ import (
 
 // go test -v github.com/samwang0723/genghis-khan/honestbee
 func TestGetServices(t *testing.T) {
-	services, _ := GetServices("PH", 14.5367633, 121.009545)
+	location := &Location{
+		Latitude:  14.5367633,
+		Longitude: 121.009545,
+	}
+	services, _ := GetServices("PH", location)
 	if len(*services) == 0 {
 		t.Error("Cannot fetch country services")
 	}
@@ -16,7 +20,11 @@ func TestGetServices(t *testing.T) {
 }
 
 func TestGetBrands(t *testing.T) {
-	brands, err := GetBrands("TW", "1", "groceries", 25.047571, 121.577812)
+	location := &Location{
+		Latitude:  25.047571,
+		Longitude: 121.577812,
+	}
+	brands, err := GetBrands("TW", "1", "groceries", location)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -25,7 +33,11 @@ func TestGetBrands(t *testing.T) {
 }
 
 func TestGetDepartments(t *testing.T) {
-	departments, err := GetDepartments("11150", 25.047571, 121.577812)
+	location := &Location{
+		Latitude:  25.047571,
+		Longitude: 121.577812,
+	}
+	departments, err := GetDepartments("11150", location)
 	if err != nil {
 		t.Error(err.Error())
 	}

@@ -27,6 +27,7 @@ const (
 
 var currentQueryStoreID string
 
+// VerificationEndpoint - facebook messenger token verification endpoint
 func VerificationEndpoint(w http.ResponseWriter, r *http.Request) {
 	challenge := r.URL.Query().Get("hub.challenge")
 	token := r.URL.Query().Get("hub.verify_token")
@@ -175,6 +176,7 @@ func ProcessMessage(event facebook.Messaging) {
 	Respond(body)
 }
 
+// MessagesEndpoint - facebook messenger communication endpoint
 func MessagesEndpoint(w http.ResponseWriter, r *http.Request) {
 	var callback facebook.Callback
 	json.NewDecoder(r.Body).Decode(&callback)
