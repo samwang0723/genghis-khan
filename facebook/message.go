@@ -158,7 +158,7 @@ func Login(SenderID string) *Response {
 	return &response
 }
 
-func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Response {
+func ListServices(SenderID string, services *[]honestbee.Service) *Response {
 	var buttons []Button
 	for _, service := range *services {
 		if service.Avaliable {
@@ -188,8 +188,8 @@ func ComposeServicesButton(SenderID string, services *[]honestbee.Service) *Resp
 	return &response
 }
 
-// ComposeLocation - response with location
-func ComposeLocation(event Messaging) *Response {
+// AskLocation - response with location
+func AskLocation(event Messaging) *Response {
 	var replies []QuickReply
 	replies = append(replies, QuickReply{
 		ContentType: "location",
@@ -206,7 +206,7 @@ func ComposeLocation(event Messaging) *Response {
 	return &response
 }
 
-func ComposeText(senderID string, message string) *Response {
+func ShowText(senderID string, message string) *Response {
 	response := Response{
 		Recipient: User{
 			ID: senderID,
@@ -218,7 +218,7 @@ func ComposeText(senderID string, message string) *Response {
 	return &response
 }
 
-func ComposeProductList(senderID string, products honestbee.Products) *Response {
+func ListProducts(senderID string, products honestbee.Products) *Response {
 	var elements []Element
 	for _, product := range *products.Products {
 		if product.Status == honestbee.STATUS_AVAILABLE {
@@ -254,7 +254,7 @@ func ComposeProductList(senderID string, products honestbee.Products) *Response 
 	return &response
 }
 
-func ComposeDepartmentList(senderID string, departments honestbee.Departments) *Response {
+func ListDepartments(senderID string, departments honestbee.Departments) *Response {
 	index := 1
 	var buttons []Button
 	for _, department := range departments.Departments {
@@ -287,8 +287,8 @@ func ComposeDepartmentList(senderID string, departments honestbee.Departments) *
 	return &response
 }
 
-//ComposeBrandList - response with brand list
-func ComposeBrandList(event Messaging, brands honestbee.Brands) *Response {
+//ListBrands - response with brand list
+func ListBrands(event Messaging, brands honestbee.Brands) *Response {
 	var elements []Element
 	for _, brand := range brands.Brands {
 		var buttons []Button

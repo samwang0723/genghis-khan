@@ -25,13 +25,11 @@ type QueryError struct {
 // CheckFacebookError parse error response
 func CheckFacebookError(r io.Reader) error {
 	var err error
-
 	qr := QueryResponse{}
 	err = json.NewDecoder(r).Decode(&qr)
 	if qr.Error != nil {
 		err = fmt.Errorf("Facebook error: %s", qr.Error.Message)
 		return err
 	}
-
 	return nil
 }
