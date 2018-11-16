@@ -13,16 +13,17 @@ import (
 var client *redis.Client
 
 func init() {
-	herokuURL := os.Getenv("REDIS_URL")
+	linkType := os.Getenv("REDIS_TYPE")
+	redisURL := os.Getenv("REDIS_URL")
 	password := ""
-	if !strings.Contains(herokuURL, "localhost") {
-		parsedURL, _ := url.Parse(herokuURL)
+	if !strings.Contains(linkType, "docker") && !strings.Contains(redisURL, "localhost") {
+		parsedURL, _ := url.Parse(redisURL)
 		password, _ = parsedURL.User.Password()
-		herokuURL = parsedURL.Host
+		redisURL = parsedURL.Host
 	}
-	log.Printf("Connecting to %s", herokuURL)
+	log.Printf("Connecting to %s", redisURL)
 	client = redis.NewClient(&redis.Options{
-		Addr:         herokuURL,
+		Addr:         redisURL,
 		Password:     password,
 		DialTimeout:  10 * time.Second,
 		ReadTimeout:  30 * time.Second,

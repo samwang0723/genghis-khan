@@ -1,0 +1,21 @@
+version: '3'
+services:
+  api:
+    build: .
+    working_dir: /go/src
+    ports:
+      - "8080:8080"
+    volumes: 
+      - .:/go/src
+    depends_on:
+      - redis
+    environment:
+      - REDIS_TYPE=docker
+      - REDIS_URL=redis:6379
+      - PORT=8080
+      - VERIFY_TOKEN=genghis-khan the power
+      - PAGE_ACCESS_TOKEN=EAADhwucJOOsBAGZCoYnRbPvRG4I6VLJc6nIRe5oAkrzDmXjHNzWwpGpU02zrEmdeci7dSSt3uMTkThlUJKhuI5sxLXfBH3pNtQxPvZC2M0vJZAyZCT9dxn1ZCcp2XDmjz7jOQOZByZABSXHrSFWHoMrxrbaU6ZAO3x99kF1OmfvoQAZDZD
+  redis:
+    image: "redis:alpine"
+    ports: 
+      - "6379:6379"
