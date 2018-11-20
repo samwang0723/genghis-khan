@@ -1,0 +1,40 @@
+workspace:
+  base: /go
+  path: /src/github.com/samwang0723/genghis-khan
+
+clone:
+  git:
+    image: plugins/git
+    depth: 50
+    tags: true
+
+services:
+  redis:
+    image: "redis:alpine"
+    ports: 
+      - "6379:6379"
+
+pipeline:
+  prepare:
+    when:
+      event: [push, pull_request, tag]
+    image: golang:1.11-alpine
+    pull: true
+    commands:
+      - apk add --update --no-cache alpine-sdk
+      - make install
+
+  test:
+    when:
+      event: [push, pull_request]
+    image: golang:1.11-alpine
+    pull: true
+    environment:
+      - REDIS_TYPE=docker
+      - REDIS_URL=redis:6379
+      - PORT=8080
+      - VERIFY_TOKEN=genghis-khan the power
+      - PAGE_ACCESS_TOKEN=EAADhwucJOOsBAGZCoYnRbPvRG4I6VLJc6nIRe5oAkrzDmXjHNzWwpGpU02zrEmdeci7dSSt3uMTkThlUJKhuI5sxLXfBH3pNtQxPvZC2M0vJZAyZCT9dxn1ZCcp2XDmjz7jOQOZByZABSXHrSFWHoMrxrbaU6ZAO3x99kF1OmfvoQAZDZD
+    commands:
+      - apk add --update --no-cache git make
+      - make test
