@@ -5,6 +5,10 @@ all: install
 install: deps
 		dep ensure -v
 
+.PHONY: test
+test:
+	go test -v github.com/samwang0723/genghis-khan/honestbee
+
 deps:
 		@hash dep > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
 			go get github.com/golang/dep/cmd/dep; \
