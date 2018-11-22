@@ -38,3 +38,21 @@ pipeline:
     commands:
       - apk add --update --no-cache git make
       - make test
+
+  publish:
+    when:
+      event: push
+      status: success
+      branch: master
+    image: plugins/docker
+    pull: true
+    repo: samwang0723/genghis-khan
+    registry: ${DOCKER_REGISTRY}
+    tags:
+      - ${DRONE_COMMIT_SHA:0:8}
+    secrets:
+      - docker_username
+      - docker_password
+      - docker_registry
+    build_args:
+      - GIT_COMMIT_HASH=${DRONE_COMMIT_SHA}
