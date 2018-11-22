@@ -46,7 +46,7 @@ pipeline:
       branch: master
     image: plugins/docker
     pull: true
-    repo: hub.docker.com/r/samwang0723/genghis-khan
+    repo: registry.hub.docker.com/samwang0723/genghis-khan
     registry: registry.hub.docker.com
     tags:
       - ${DRONE_COMMIT_SHA:0:8}
