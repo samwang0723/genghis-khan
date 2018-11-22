@@ -49,7 +49,7 @@ pipeline:
     repo: registry.hub.docker.com/samwang0723/genghis-khan
     registry: registry.hub.docker.com
     tags:
-      - ${DRONE_COMMIT_SHA:0:8}
+      - ${DRONE_TAG##v}
     secrets:
       - docker_username
       - docker_password
