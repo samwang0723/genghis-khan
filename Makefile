@@ -16,7 +16,8 @@ deps:
 
 .PHONY: build
 build:
-	docker-compose build
+	docker-compose build --force-rm
+	docker rmi `docker images -q -f dangling=true`
 
 .PHONY: up
 up:
