@@ -41,7 +41,7 @@ pipeline:
 
   publish:
     when:
-      event: push
+      event: tag
       status: success
       branch: master
     image: plugins/docker
@@ -55,4 +55,5 @@ pipeline:
       - docker_password
       - docker_registry
     build_args:
+      - VERSION=${DRONE_TAG}
       - GIT_COMMIT_HASH=${DRONE_COMMIT_SHA}
