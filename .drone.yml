@@ -57,3 +57,13 @@ pipeline:
     build_args:
       - VERSION=${DRONE_TAG}
       - GIT_COMMIT_HASH=${DRONE_COMMIT_SHA}
+
+  deploy:
+    when:
+      event: tag
+      status: success
+      branch: master
+    image: sh4d1/drone-kubernetes
+    kubernetes_template: kubernetes/deployment.yml
+    kubernetes_namespace: genghis-khan
+    secrets: [ kubernetes_server, kubernetes_cert, kubernetes_token ]
