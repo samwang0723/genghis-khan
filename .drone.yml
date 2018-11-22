@@ -47,7 +47,7 @@ pipeline:
     image: plugins/docker
     pull: true
     repo: samwang0723/genghis-khan
-    registry: ${DOCKER_REGISTRY}
+    registry: registry.hub.docker.com
     tags:
       - ${DRONE_COMMIT_SHA:0:8}
     secrets:
