@@ -66,4 +66,7 @@ pipeline:
     image: sh4d1/drone-kubernetes
     kubernetes_template: kubernetes/deployment.yml
     kubernetes_namespace: genghis-khan
-    secrets: [ kubernetes_server, kubernetes_cert, kubernetes_token ]
+    secrets: 
+      - kubernetes_server
+      - kubernetes_cert
+      - kubernetes_token

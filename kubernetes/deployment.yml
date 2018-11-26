@@ -102,6 +102,8 @@ spec:
       labels:
         io.kompose.service: genghis-khan
     spec:
+      imagePullSecrets:
+      - name: regcred
       containers:
       - env:
         - name: PAGE_ACCESS_TOKEN
