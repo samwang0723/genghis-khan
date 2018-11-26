@@ -109,7 +109,7 @@ spec:
           value: redis:6379
         - name: VERIFY_TOKEN
           value: genghis-khan the power
-        image: registry.hub.docker.com/samwang0723/genghis-khan:${DRONE_TAG}
+        image: registry.hub.docker.com/samwang0723/genghis-khan:${DRONE_TAG##v}
         imagePullPolicy: Always
         name: genghis-khan
         ports:
