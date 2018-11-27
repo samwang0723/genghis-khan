@@ -25,3 +25,6 @@
     
     kubectl create -f kubernetes/drone-deployment.yml
     
+### Check rolebindings exists
+
+    kubectl --namespace genghis-khan get rolebinding
