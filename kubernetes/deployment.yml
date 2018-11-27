@@ -34,6 +34,8 @@ kind: Service
 metadata:
   name: redis
   namespace: genghis-khan
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: nil
 spec:
   type: LoadBalancer
   ports:
@@ -108,6 +110,8 @@ kind: Service
 metadata:
   name: genghis-khan
   namespace: genghis-khan
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: nil
 spec:
   type: LoadBalancer
   ports:
