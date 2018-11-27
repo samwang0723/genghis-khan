@@ -6,15 +6,11 @@
 ### Get Certification & Token
     
     kubectl -n genghis-khan get secrets
-    
-
-    
     kubectl get secret -n genghis-khan default-token-hjv2z -o yaml | egrep 'ca.crt:|token:'
     
 
-    Decode token with base64:
+### Decode token with base64:
 
-    
     echo "<encoded token>" | base64 -d
     
 
