@@ -1,12 +1,6 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../docker-compose.yml
-    kompose.version: 1.17.0 ()
-  creationTimestamp: null
-  labels:
-    io.kompose.service: redis
   name: redis
   namespace: genghis-khan
 spec:
@@ -14,9 +8,8 @@ spec:
   strategy: {}
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: redis
+        app: redis
     spec:
       containers:
       - image: redis:alpine
@@ -26,19 +19,12 @@ spec:
           protocol: TCP
         resources: {}
       restartPolicy: Always
-status: {}
 
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../docker-compose.yml
-    kompose.version: 1.17.0 ()
-  creationTimestamp: null
-  labels:
-    io.kompose.service: redis
   name: redis
   namespace: genghis-khan
 spec:
@@ -49,16 +35,13 @@ spec:
     port: 6379
     targetPort: 6379
   selector:
-    io.kompose.service: redis
+    app: redis
 
 ---
 
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  creationTimestamp: null
-  labels:
-    io.kompose.service: genghis-khan-claim0
   name: genghis-khan-claim0
   namespace: genghis-khan
 spec:
@@ -67,19 +50,12 @@ spec:
   resources:
     requests:
       storage: 100Mi
-status: {}
 
 ---
 
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../docker-compose.yml
-    kompose.version: 1.17.0 ()
-  creationTimestamp: null
-  labels:
-    io.kompose.service: genghis-khan
   name: genghis-khan
   namespace: genghis-khan
 spec:
@@ -92,9 +68,8 @@ spec:
   minReadySeconds: 5
   template:
     metadata:
-      creationTimestamp: null
       labels:
-        io.kompose.service: genghis-khan
+        app: genghis-khan
     spec:
       imagePullSecrets:
       - name: regcred
@@ -126,19 +101,12 @@ spec:
       - name: genghis-khan-claim0
         persistentVolumeClaim:
           claimName: genghis-khan-claim0
-status: {}
 
 ---
 
 apiVersion: v1
 kind: Service
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f ../docker-compose.yml
-    kompose.version: 1.17.0 ()
-  creationTimestamp: null
-  labels:
-    io.kompose.service: genghis-khan
   name: genghis-khan
   namespace: genghis-khan
 spec:
@@ -149,4 +117,4 @@ spec:
     port: 8080
     targetPort: 8080
   selector:
-    io.kompose.service: genghis-khan
+    app: genghis-khan
